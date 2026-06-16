@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="PromptCash — зарабатывайте реальные деньги пока пользуетесь ChatGPT. Бесплатное расширение для Chrome."/>
+<title>PromptCash — Зарабатывай на ChatGPT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#10a37f;
+  --green-light:#12c49a;
+  --bg:#0a0a0a;
+  --bg2:#111111;
+  --bg3:#1a1a1a;
+  --border:#252525;
+  --text:#f5f5f5;
+  --muted:#888;
+  --muted2:#444;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{display:flex;justify-content:space-between;align-items:center;padding:18px 48px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);z-index:100}
+.logo{font-size:18px;font-weight:800;letter-spacing:-0.5px;text-decoration:none;color:var(--text)}
+.logo em{color:var(--green);font-style:normal}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--green);color:#fff!important;padding:9px 20px;border-radius:8px;font-weight:600!important;transition:background .2s!important}
+.nav-cta:hover{background:var(--green-light)!important}
+
+/* TOGGLE */
+.toggle-wrap{display:flex;justify-content:center;padding:56px 20px 0}
+.toggle{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:4px;gap:4px}
+.toggle-btn{padding:11px 28px;border-radius:9px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted);font-family:'Inter',sans-serif}
+.toggle-btn.active{background:var(--green);color:#fff}
+
+/* HERO */
+.hero{text-align:center;padding:56px 24px 72px;max-width:820px;margin:0 auto}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:20px}
+.hero h1{font-size:clamp(38px,6vw,68px);font-weight:900;line-height:1.06;letter-spacing:-2.5px;margin-bottom:22px}
+.hero h1 em{color:var(--green);font-style:normal}
+.hero p{font-size:17px;color:var(--muted);max-width:540px;margin:0 auto 36px;line-height:1.75}
+
+/* COUNTERS */
+.counters{display:inline-flex;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:44px}
+.cnt-item{padding:24px 36px;text-align:center;border-right:1px solid var(--border)}
+.cnt-item:last-child{border-right:none}
+.cnt-num{font-size:32px;font-weight:800;color:var(--green);letter-spacing:-1px;font-variant-numeric:tabular-nums;line-height:1}
+.cnt-lbl{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:1px}
+
+/* BUTTONS */
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-main{background:var(--green);color:#fff;border:none;padding:15px 34px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;display:inline-block;font-family:'Inter',sans-serif}
+.btn-main:hover{background:var(--green-light);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border);padding:15px 34px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;display:inline-block}
+.btn-outline:hover{border-color:var(--green);color:var(--green)}
+.hint{font-size:12px;color:var(--muted2);margin-top:14px}
+
+/* SECTION */
+.section{padding:80px 48px;max-width:1100px;margin:0 auto}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.sec-title{font-size:clamp(26px,4vw,42px);font-weight:800;letter-spacing:-1px;margin-bottom:44px;line-height:1.15}
+hr.div{border:none;border-top:1px solid var(--border);max-width:1100px;margin:0 auto}
+
+/* STEPS */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.step{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;transition:border-color .2s}
+.step:hover{border-color:var(--green)}
+.step-n{font-size:11px;font-weight:700;color:var(--green);margin-bottom:14px;letter-spacing:1px}
+.step h3{font-size:17px;font-weight:700;margin-bottom:8px}
+.step p{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* INSTALL MODAL */
+.install-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px}
+.install-modal.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:520px;width:100%;position:relative}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer}
+.modal-box h2{font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px}
+.modal-box p{color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.6}
+.install-steps{list-style:none;margin-bottom:28px}
+.install-steps li{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;line-height:1.5}
+.install-steps li:last-child{border-bottom:none}
+.install-steps .n{background:var(--green);color:#fff;font-size:12px;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.dl-btn{background:var(--green);color:#fff;border:none;width:100%;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px}
+.dl-btn:hover{background:var(--green-light)}
+.modal-note{font-size:12px;color:var(--muted2);text-align:center}
+
+/* CALC */
+.calc-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:36px;max-width:580px;margin:0 auto}
+.calc-wrap h3{font-size:20px;font-weight:700;margin-bottom:28px}
+.sl-group{margin-bottom:24px}
+.sl-group label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;color:var(--muted)}
+.sl-group label strong{color:var(--green)}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--green);border-radius:50%;cursor:pointer}
+.calc-result{background:var(--bg3);border-radius:12px;padding:24px;text-align:center;margin-top:20px}
+.result-amt{font-size:52px;font-weight:900;color:var(--green);letter-spacing:-2px;line-height:1}
+.result-per{font-size:13px;color:var(--muted);margin-top:6px}
+.result-note{font-size:13px;color:var(--muted2);margin-top:14px;padding-top:14px;border-top:1px solid var(--border);line-height:1.6}
+.result-note strong{color:var(--green)}
+
+/* PRIVACY */
+.priv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.priv-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;gap:14px}
+.priv-icon{font-size:24px;flex-shrink:0}
+.priv-card h4{font-size:14px;font-weight:700;margin-bottom:4px}
+.priv-card p{font-size:13px;color:var(--muted);line-height:1.55}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:44px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center}
+.stat .n{font-size:38px;font-weight:900;color:var(--green);letter-spacing:-1px;line-height:1}
+.stat .l{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* AD PREVIEW */
+.ad-preview{background:#fff;border-radius:14px;padding:20px;max-width:320px;color:#111;font-family:-apple-system,sans-serif}
+.ad-lbl{font-size:11px;color:#888;margin-bottom:8px}
+.ad-title{font-size:15px;font-weight:700;margin-bottom:5px}
+.ad-desc{font-size:13px;color:#555;margin-bottom:14px;line-height:1.45}
+.ad-cta-btn{background:#10a37f;color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-bottom:10px}
+.ad-foot{display:flex;justify-content:space-between;font-size:11px;color:#aaa}
+
+/* PRICING */
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px}
+.price-card.hot{border-color:var(--green)}
+.price-badge{background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:14px;letter-spacing:1px;text-transform:uppercase}
+.price-name{font-size:17px;font-weight:700;margin-bottom:6px}
+.price-amt{font-size:34px;font-weight:900;letter-spacing:-1px;margin-bottom:4px;line-height:1}
+.price-amt span{font-size:15px;font-weight:400;color:var(--muted)}
+.price-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.price-list{list-style:none;margin-bottom:24px}
+.price-list li{font-size:13px;padding:7px 0;border-bottom:1px solid var(--border);color:var(--muted);display:flex;gap:8px}
+.price-list li::before{content:"✓";color:var(--green);font-weight:700}
+
+/* FAQ */
+.faq-wrap{max-width:680px}
+.faq-item{border-bottom:1px solid var(--border);padding:20px 0;cursor:pointer}
+.faq-q{font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.faq-icon{color:var(--green);font-size:20px;flex-shrink:0;transition:transform .2s}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7;display:none}
+.faq-item.open .faq-a{display:block}
+
+/* BIG CTA */
+.big-cta{text-align:center;padding:80px 24px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.big-cta h2{font-size:clamp(26px,4vw,46px);font-weight:900;letter-spacing:-1px;margin-bottom:14px}
+.big-cta p{color:var(--muted);margin-bottom:30px;font-size:15px}
+
+/* FOOTER */
+footer{padding:36px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;color:var(--muted);font-size:13px}
+.footer-logo{font-weight:800;color:var(--text);font-size:15px}
+.footer-logo em{color:var(--green);font-style:normal}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--text)}
+
+/* VIEW */
+.view{display:none}
+.view.active{display:block}
+
+@media(max-width:680px){
+  nav{padding:14px 20px}
+  .nav-links{display:none}
+  .section{padding:56px 20px}
+  .cnt-item{padding:18px 20px}
+  .cnt-num{font-size:24px}
+  footer{flex-direction:column;text-align:center;padding:28px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">💰 Prompt<em>Cash</em></a>
+  <div class="nav-links">
+    <a href="#how">Как работает</a>
+    <a href="#privacy">Конфиденциальность</a>
+    <a href="#" onclick="switchView('adv');return false">Рекламодателям</a>
+    <a href="#" class="nav-cta" onclick="openInstall();return false">Установить бесплатно</a>
+  </div>
+</nav>
+
+<!-- TOGGLE -->
+<div class="toggle-wrap">
+  <div class="toggle">
+    <button class="toggle-btn active" onclick="switchView('users')">Для пользователей</button>
+    <button class="toggle-btn" onclick="switchView('adv')">Для рекламодателей</button>
+  </div>
+</div>
+
+<!-- ======= ПОЛЬЗОВАТЕЛИ ======= -->
+<div class="view active" id="view-users">
+
+  <div class="hero">
+    <div class="eyebrow">Пассивный доход от ChatGPT</div>
+    <h1>Окупи подписку GPT<br>за счёт <em>рекламы</em></h1>
+    <p>Установи расширение, включи спонсорские карточки — и получай фиксированные выплаты каждый раз когда пользуешься ChatGPT. Большинство пользователей окупают GPT Plus в течение нескольких недель.</p>
+
+    <div class="counters">
+      <div class="cnt-item">
+        <div class="cnt-num" id="c1">0</div>
+        <div class="cnt-lbl">показов сегодня</div>
+      </div>
+      <div class="cnt-item">
+        <div class="cnt-num" id="c2">$0.00</div>
+        <div class="cnt-lbl">выплачено сегодня</div>
+      </div>
+      <div class="cnt-item">
+        <div class="cnt-num" id="c3">0</div>
+        <div class="cnt-lbl">активных пользователей</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="#" class="btn-main" onclick="openInstall();return false">⬇ Установить бесплатно</a>
+      <a href="#how" class="btn-outline">Как это работает</a>
+    </div>
+    <p class="hint">Chrome · Бесплатно · Без карты · 30 секунд</p>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- КАК РАБОТАЕТ -->
+  <div class="section" id="how">
+    <div class="sec-label">Как это работает</div>
+    <div class="sec-title">Три шага до первой выплаты</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">ШАГ 01</div>
+        <h3>Устанавливаешь расширение</h3>
+        <p>Скачай PromptCash и установи в Chrome за 30 секунд. Работает автоматически на chatgpt.com.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">ШАГ 02</div>
+        <h3>Включаешь спонсорские карточки</h3>
+        <p>В popup расширения нажми «Включено». Небольшая карточка появится в углу экрана — чётко помечена как реклама.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">ШАГ 03</div>
+        <h3>Получаешь выплаты</h3>
+        <p>Каждый валидный показ приносит $0.0025. Накопи $20 — запроси выплату на PayPal или Wise.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- КАЛЬКУЛЯТОР -->
+  <div class="section">
+    <div class="sec-label">Калькулятор заработка</div>
+    <div class="sec-title">Сколько можно заработать?</div>
+    <div class="calc-wrap">
+      <h3>Рассчитай свой доход</h3>
+      <div class="sl-group">
+        <label>Сессий ChatGPT в день <strong id="v1">5</strong></label>
+        <input type="range" min="1" max="30" value="5" oninput="calc()" id="s1"/>
+      </div>
+      <div class="sl-group">
+        <label>Активных дней в месяц <strong id="v2">20</strong></label>
+        <input type="range" min="5" max="30" value="20" oninput="calc()" id="s2"/>
+      </div>
+      <div class="calc-result">
+        <div class="result-amt" id="r-amt">$2.50</div>
+        <div class="result-per">в месяц (примерно)</div>
+        <div class="result-note">
+          Это <strong id="r-pct">12%</strong> стоимости подписки ChatGPT Plus ($20/мес).<br>
+          При максимальной активности — <strong>100% окупаемость</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- КОНФИДЕНЦИАЛЬНОСТЬ -->
+  <div class="section" id="privacy">
+    <div class="sec-label">Конфиденциальность</div>
+    <div class="sec-title">Мы никогда не читаем<br>ваши запросы</div>
+    <div class="priv-grid">
+      <div class="priv-card">
+        <div class="priv-icon">🔒</div>
+        <div>
+          <h4>Ноль доступа к промптам</h4>
+          <p>PromptCash никогда не читает, не хранит и не передаёт ваши разговоры в ChatGPT.</p>
+        </div>
+      </div>
+      <div class="priv-card">
+        <div class="priv-icon">👁</div>
+        <div>
+          <h4>Никаких данных аккаунта</h4>
+          <p>Мы не получаем доступ к вашему email, cookies, токенам или данным OpenAI.</p>
+        </div>
+      </div>
+      <div class="priv-card">
+        <div class="priv-icon">🏷</div>
+        <div>
+          <h4>Всегда помечено</h4>
+          <p>Каждое объявление помечено: «Реклама · Не является частью ответа ChatGPT».</p>
+        </div>
+      </div>
+      <div class="priv-card">
+        <div class="priv-icon">✅</div>
+        <div>
+          <h4>Ты управляешь</h4>
+          <p>Включай и отключай в любой момент из popup. Пауза на 24ч — одна кнопка.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="sec-label">Вопросы и ответы</div>
+    <div class="sec-title">Частые вопросы</div>
+    <div class="faq-wrap">
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">Сколько реально можно заработать? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Каждый валидный показ боковой карточки = $0.0025. При 25 показах в день (дневной лимит) и 20 активных днях это $1.25 в месяц. При максимальной активности (30 дней × 30 сессий) — до $2.25/мес. Карточка ожидания приносит $0.004 за показ.</div>
+      </div>
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">Когда можно вывести деньги? <span class="faq-icon">+</span></div>
+        <div class="faq-a">После начисления деньги проходят 7-дневный период проверки, затем становятся доступны для вывода. Минимальная сумма вывода — $20. В период бета-тестирования выплаты обрабатываются вручную раз в неделю через PayPal или Wise.</div>
+      </div>
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">Это не замедлит ChatGPT? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Нет. PromptCash добавляет лёгкую карточку через Shadow DOM — изолированно от страницы ChatGPT. Это никак не влияет на скорость и качество ответов.</div>
+      </div>
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">Это точно бесплатно? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Да. PromptCash бесплатен для установки и использования. Деньги платим мы тебе — не наоборот.</div>
+      </div>
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">На каких браузерах работает? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Сейчас только Google Chrome (десктоп). Поддержка Edge, Brave и Firefox планируется в следующих версиях.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="big-cta">
+    <h2>Начни зарабатывать сегодня</h2>
+    <p>Бесплатное расширение. Никакой настройки. Никакой карты.</p>
+    <a href="#" class="btn-main" style="font-size:16px;padding:16px 44px" onclick="openInstall();return false">⬇ Установить PromptCash</a>
+    <p class="hint" style="margin-top:14px">Работает на chatgpt.com · Только Chrome · v0.1.0 Beta</p>
+  </div>
+
+</div>
+<!-- КОНЕЦ ПОЛЬЗОВАТЕЛИ -->
+
+<!-- ======= РЕКЛАМОДАТЕЛИ ======= -->
+<div class="view" id="view-adv">
+
+  <div class="hero">
+    <div class="eyebrow">Реклама внутри ChatGPT</div>
+    <h1>Достучись до аудитории<br>пока она <em>думает</em></h1>
+    <p>PromptCash размещает вашу спонсорскую карточку внутри ChatGPT — перед разработчиками, основателями и создателями в момент, когда они активно решают задачи.</p>
+    <div class="cta-row">
+      <a href="mailto:ads@promptcash.io" class="btn-main">Начать рекламу →</a>
+      <a href="#formats" class="btn-outline">Форматы рекламы</a>
+    </div>
+    <p class="hint">Отвечаем в течение 24 часов</p>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="sec-label">Почему PromptCash</div>
+    <div class="sec-title">Аудитория, которую хотят рекламодатели</div>
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="n">100%</div>
+        <div class="l">AI-нативные пользователи</div>
+      </div>
+      <div class="stat">
+        <div class="n">$0.003</div>
+        <div class="l">средний CPM (бета-тариф)</div>
+      </div>
+      <div class="stat">
+        <div class="n">1.5с+</div>
+        <div class="l">гарантированная видимость</div>
+      </div>
+      <div class="stat">
+        <div class="n">0</div>
+        <div class="l">блокировщиков рекламы (Shadow DOM)</div>
+      </div>
+    </div>
+    <p style="color:var(--muted);font-size:14px;text-align:center">Ваша реклама охватывает людей, которые платят за AI-инструменты — самую высокомотивированную tech-аудиторию.</p>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section" id="formats">
+    <div class="sec-label">Форматы рекламы</div>
+    <div class="sec-title">Как выглядит ваша реклама</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start" id="fmt-grid">
+      <div>
+        <h3 style="font-size:18px;font-weight:700;margin-bottom:10px">Боковая карточка</h3>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:18px;line-height:1.65">Фиксированная позиция, правый нижний угол. Видна на протяжении всей сессии. $0.0025 за валидный показ.</p>
+        <ul style="list-style:none;font-size:13px;color:var(--muted)">
+          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✓ Минимум 1.5с видимости верифицировано</li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✓ Проверка активности вкладки</li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--border)">✓ Чётко помечено «Реклама»</li>
+          <li style="padding:8px 0">✓ CTA-ссылка на ваш сайт</li>
+        </ul>
+      </div>
+      <div>
+        <div class="ad-preview" style="box-shadow:0 8px 32px rgba(0,0,0,.3)">
+          <div class="ad-lbl">Реклама · Не является частью ответа ChatGPT</div>
+          <div class="ad-title">Создавайте быстрее с AI-инструментами</div>
+          <div class="ad-desc">Полезные продукты для разработчиков, создателей и основателей.</div>
+          <button class="ad-cta-btn">Узнать больше</button>
+          <div class="ad-foot"><span>Почему я вижу это?</span><span>×</span></div>
+        </div>
+        <p style="font-size:12px;color:var(--muted2);text-align:center;margin-top:12px">Живой превью боковой карточки</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="sec-label">Начало работы</div>
+    <div class="sec-title">Запустить за несколько минут</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">ШАГ 01</div>
+        <h3>Свяжитесь с нами</h3>
+        <p>Напишите на ads@promptcash.io с описанием кампании. Аккаунт и кампанию настроим в течение 24 часов.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">ШАГ 02</div>
+        <h3>Создайте объявление</h3>
+        <p>Заголовок (до 60 символов), описание (до 120 символов), текст кнопки и ссылка. Всё.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">ШАГ 03</div>
+        <h3>Запускайтесь</h3>
+        <p>Объявление ротируется среди всех активных пользователей PromptCash. Следите за статистикой в реальном времени.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="sec-label">Тарифы</div>
+    <div class="sec-title">Прозрачные цены</div>
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="price-name">Старт</div>
+        <div class="price-amt">$50 <span>/ кампания</span></div>
+        <div class="price-desc">Идеально для первого теста PromptCash.</div>
+        <ul class="price-list">
+          <li>До 20 000 показов</li>
+          <li>Боковая карточка</li>
+          <li>Базовая аналитика</li>
+          <li>1 активная кампания</li>
+        </ul>
+        <a href="mailto:ads@promptcash.io" class="btn-outline" style="width:100%;text-align:center;display:block;padding:11px">Начать</a>
+      </div>
+      <div class="price-card hot">
+        <div class="price-badge">Популярный</div>
+        <div class="price-name">Рост</div>
+        <div class="price-amt">$200 <span>/ кампания</span></div>
+        <div class="price-desc">Масштабируй охват на всю базу PromptCash.</div>
+        <ul class="price-list">
+          <li>До 100 000 показов</li>
+          <li>Боковая + карточка ожидания</li>
+          <li>Полная аналитика</li>
+          <li>До 3 активных кампаний</li>
+          <li>Приоритетная поддержка</li>
+        </ul>
+        <a href="mailto:ads@promptcash.io" class="btn-main" style="width:100%;text-align:center;display:block;padding:11px">Начать</a>
+      </div>
+      <div class="price-card">
+        <div class="price-name">Enterprise</div>
+        <div class="price-amt">Индивид. <span></span></div>
+        <div class="price-desc">Для брендов с эксклюзивными размещениями.</div>
+        <ul class="price-list">
+          <li>Неограниченные показы</li>
+          <li>Все форматы</li>
+          <li>Персональный менеджер</li>
+          <li>Кастомная отчётность</li>
+          <li>Эксклюзивные слоты</li>
+        </ul>
+        <a href="mailto:ads@promptcash.io" class="btn-outline" style="width:100%;text-align:center;display:block;padding:11px">Написать нам</a>
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="sec-label">Вопросы и ответы</div>
+    <div class="sec-title">Вопросы рекламодателей</div>
+    <div class="faq-wrap">
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">Кто видит мою рекламу? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Все пользователи, которые добровольно включили спонсорские показы в PromptCash. Это активные пользователи ChatGPT — разработчики, основатели, создатели контента, которые платят за AI-инструменты.</div>
+      </div>
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">Как считается показ? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Показ засчитывается только если: карточка видима минимум 1.5 секунды, вкладка браузера активна, карточка находится в зоне видимости. Фоновые и скрытые показы не считаются.</div>
+      </div>
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">Можно таргетировать по теме запроса? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Нет — и это принципиально. PromptCash никогда не читает промпты пользователей. Реклама показывается всем включённым пользователям через простую ротацию. Это наше обещание конфиденциальности.</div>
+      </div>
+      <div class="faq-item" onclick="faq(this)">
+        <div class="faq-q">Как отслеживать эффективность? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Вы получаете доступ к дашборду в реальном времени: показы, клики, CTR и расходы. В период бета-тестирования отчёты также отправляются еженедельно по email.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="big-cta">
+    <h2>Готовы охватить AI-аудиторию?</h2>
+    <p>Бета-тарифы значительно ниже рыночных. Запустите первую кампанию сегодня.</p>
+    <a href="mailto:ads@promptcash.io" class="btn-main" style="font-size:16px;padding:16px 44px">Написать нам →</a>
+    <p class="hint" style="margin-top:14px">Отвечаем в течение 24 часов</p>
+  </div>
+
+</div>
+<!-- КОНЕЦ РЕКЛАМОДАТЕЛИ -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">💰 Prompt<em>Cash</em></div>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center">
+    <a href="mailto:hello@promptcash.io">hello@promptcash.io</a>
+    <a href="#">Политика конфиденциальности</a>
+    <a href="#" onclick="switchView('adv');return false">Рекламодателям</a>
+  </div>
+  <div>© 2026 PromptCash · Не является продуктом OpenAI</div>
+</footer>
+
+<!-- МОДАЛ УСТАНОВКИ -->
+<div class="install-modal" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeInstall()">×</button>
+    <h2>Установить PromptCash</h2>
+    <p>Расширение устанавливается вручную — займёт меньше минуты. Следуй инструкции ниже.</p>
+    <ol class="install-steps">
+      <li>
+        <span class="n">1</span>
+        <span>Нажми кнопку ниже и скачай ZIP-архив с расширением</span>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <span>Распакуй архив в любую папку на компьютере</span>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <span>Открой Chrome и перейди по адресу <strong>chrome://extensions</strong></span>
+      </li>
+      <li>
+        <span class="n">4</span>
+        <span>Включи <strong>«Режим разработчика»</strong> (переключатель в правом верхнем углу)</span>
+      </li>
+      <li>
+        <span class="n">5</span>
+        <span>Нажми <strong>«Загрузить распакованное»</strong> и выбери папку с расширением</span>
+      </li>
+      <li>
+        <span class="n">6</span>
+        <span>Готово! Открой chatgpt.com и включи расширение через иконку 💰 в браузере</span>
+      </li>
+    </ol>
+    <button class="dl-btn" onclick="alert('Скоро! Свяжитесь с нами: hello@promptcash.io')">⬇ Скачать PromptCash v0.1.0</button>
+    <p class="modal-note">Только Chrome · Десктоп · Бесплатно навсегда</p>
+  </div>
+</div>
+
+<script>
+function switchView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  const idx = v === 'users' ? 0 : 1;
+  document.querySelectorAll('.toggle-btn')[idx].classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function openInstall() {
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeInstall() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeInstall();
+});
+
+function faq(el) { el.classList.toggle('open'); }
+
+// Счётчики
+function animCount(id, to, prefix, suffix, dec) {
+  const el = document.getElementById(id);
+  let cur = 0;
+  const step = to / 50;
+  const t = setInterval(() => {
+    cur = Math.min(cur + step, to);
+    el.textContent = prefix + cur.toFixed(dec) + suffix;
+    if (cur >= to) clearInterval(t);
+  }, 20);
+}
+window.addEventListener('load', () => {
+  animCount('c1', 1247, '', '', 0);
+  animCount('c2', 3.12, '$', '', 2);
+  animCount('c3', 89, '', '', 0);
+});
+
+// Калькулятор
+function calc() {
+  const s = +document.getElementById('s1').value;
+  const d = +document.getElementById('s2').value;
+  document.getElementById('v1').textContent = s;
+  document.getElementById('v2').textContent = d;
+  const amt = s * d * 0.0025;
+  const pct = Math.min(Math.round(amt / 20 * 100), 100);
+  document.getElementById('r-amt').textContent = '$' + amt.toFixed(2);
+  document.getElementById('r-pct').textContent = pct + '%';
+}
+
+// Сетка форматов — адаптив
+function fixGrid() {
+  const g = document.getElementById('fmt-grid');
+  if (g) g.style.gridTemplateColumns = window.innerWidth < 680 ? '1fr' : '1fr 1fr';
+}
+window.addEventListener('resize', fixGrid);
+fixGrid();
+</script>
+</body>
+</html>
