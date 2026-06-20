@@ -23,12 +23,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
 .sb-nav{padding:12px 8px;flex:1}
 .sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--mt);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
 .sb-item:hover,.sb-item.active{background:var(--bg3);color:var(--tx)}
+.sb-company{margin:8px;padding:14px;background:var(--bg3);border:1px solid var(--bd);border-radius:10px}
+.sb-company .cname{font-size:13px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-company .cind{font-size:11px;color:var(--mt)}
 .sb-balance{margin:8px;padding:14px;background:var(--bg3);border:1px solid var(--bd);border-radius:10px}
 .sb-balance .lbl{font-size:11px;color:var(--mt);margin-bottom:4px}
 .sb-balance .amt{font-size:20px;font-weight:800;color:var(--g)}
 .sb-balance .sub{font-size:11px;color:var(--mt2);margin-top:2px}
 .sb-topup{display:block;width:100%;margin-top:10px;background:var(--g);color:#fff;border:none;border-radius:7px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
 .sb-topup:hover{background:var(--gl)}
+.sb-logout{margin:8px;padding:9px;background:none;border:1px solid var(--bd);color:var(--mt);border-radius:7px;font-size:12px;cursor:pointer;width:calc(100% - 16px);font-family:'Inter',sans-serif}
+.sb-logout:hover{border-color:var(--red);color:var(--red)}
 .page{display:none}.page.active{display:block}
 .ph{margin-bottom:28px}
 .ph h1{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
@@ -47,7 +52,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
 .badge.active{background:rgba(16,163,127,.15);color:var(--g)}
 .badge.paused{background:rgba(245,166,35,.12);color:var(--yellow)}
-.badge.moderation{background:rgba(100,100,255,.12);color:#aaf}
 .form-group{margin-bottom:20px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .form-label{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;color:var(--mt);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
@@ -56,9 +60,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
 .form-input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;color:var(--tx);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s}
 .form-input:focus{border-color:var(--g)}
 .form-input::placeholder{color:var(--mt2)}
+.form-input:disabled{opacity:.6;cursor:not-allowed}
 .form-textarea{resize:vertical;min-height:80px}
 .form-hint{font-size:11px;color:var(--mt2);margin-top:6px;line-height:1.5}
 .form-hint.error{color:var(--red)}
+select.form-input{cursor:pointer}
 .preview-wrap{position:sticky;top:32px}
 .preview-card{background:#fff;border-radius:12px;padding:16px;color:#111;font-family:-apple-system,sans-serif;box-shadow:0 4px 24px rgba(0,0,0,.4);max-width:320px}
 .preview-lbl{font-size:10px;color:#888;margin-bottom:8px}
@@ -70,7 +76,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
 .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s}
 .btn-primary{background:var(--g);color:#fff}.btn-primary:hover{background:var(--gl)}
 .btn-secondary{background:var(--bg3);color:var(--tx);border:1px solid var(--bd2)}.btn-secondary:hover{border-color:var(--g);color:var(--g)}
-.btn-danger{background:rgba(230,85,85,.1);color:var(--red);border:1px solid rgba(230,85,85,.2)}.btn-danger:hover{background:rgba(230,85,85,.2)}
 .btn-sm{padding:7px 12px;font-size:12px}
 .btn-group{display:flex;gap:8px;flex-wrap:wrap}
 .progress-wrap{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden;margin-top:8px}
@@ -90,15 +95,28 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
 .alert.info{background:rgba(16,163,127,.1);border:1px solid rgba(16,163,127,.2);color:var(--g)}
 .alert.warn{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);color:var(--yellow)}
 .alert.error{background:rgba(230,85,85,.1);border:1px solid rgba(230,85,85,.2);color:var(--red)}
+.alert.success{background:rgba(16,163,127,.1);border:1px solid rgba(16,163,127,.2);color:var(--g)}
 .chart-stub{background:var(--bg3);border-radius:10px;height:160px;display:flex;align-items:flex-end;padding:12px;gap:4px}
 .bar{flex:1;background:var(--g);border-radius:2px 2px 0 0;opacity:.7;min-width:4px}
 .loading{color:var(--mt);font-size:13px;padding:20px;text-align:center}
+.gate{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.gate p{color:var(--mt);font-size:14px}
+.apikey-box{display:flex;gap:8px;align-items:center;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:13px}
+.apikey-box span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.copy-btn{background:var(--bg2);border:1px solid var(--bd2);color:var(--mt);border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif}
+.copy-btn:hover{color:var(--g);border-color:var(--g)}
 @media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.stats-row{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<div class="layout">
+<div class="gate" id="gate" style="display:none">
+  <div class="logo" style="font-size:22px;font-weight:800">💰 PromptCash</div>
+  <p>Для доступа к кабинету нужно войти</p>
+  <a href="auth.html" class="btn btn-primary">Войти / Зарегистрироваться</a>
+</div>
+
+<div class="layout" id="app" style="display:none">
   <div class="sidebar">
     <div class="sb-logo">💰 Prompt<em>Cash</em></div>
     <nav class="sb-nav">
@@ -106,15 +124,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
       <button class="sb-item" onclick="showPage('campaigns')"><span>📢</span> Кампании</button>
       <button class="sb-item" onclick="showPage('new-campaign')"><span>✏️</span> Новая кампания</button>
       <button class="sb-item" onclick="showPage('billing')"><span>💳</span> Баланс и оплата</button>
+      <button class="sb-item" onclick="showPage('profile')"><span>🏢</span> Профиль компании</button>
       <button class="sb-item" onclick="showPage('help')"><span>❓</span> Помощь</button>
     </nav>
     <div style="padding:8px">
+      <div class="sb-company">
+        <div class="cname" id="sb-company-name">—</div>
+        <div class="cind" id="sb-company-ind">—</div>
+      </div>
       <div class="sb-balance">
         <div class="lbl">Баланс</div>
         <div class="amt" id="sb-bal">—</div>
         <div class="sub" id="sb-shows">загрузка...</div>
         <button class="sb-topup" onclick="openModal('modal-topup')">+ Пополнить</button>
       </div>
+      <button class="sb-logout" onclick="logout()">Выйти</button>
     </div>
   </div>
 
@@ -130,11 +154,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
         <div class="stat-box"><div class="val" id="d-spent">—</div><div class="lbl">Потрачено</div></div>
       </div>
       <div class="card">
-        <div class="card-title">📈 Показы по дням (последние 30 дней)</div>
+        <div class="card-title">📈 Показы по дням</div>
         <div class="chart-stub" id="chart"></div>
       </div>
       <div class="card">
-        <div class="card-title">📢 Активные кампании</div>
+        <div class="card-title">📢 Кампании</div>
         <div id="dash-campaigns"><div class="loading">Загрузка...</div></div>
       </div>
     </div>
@@ -155,7 +179,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
     <!-- НОВАЯ КАМПАНИЯ -->
     <div class="page" id="page-new-campaign">
       <div class="ph"><h1>Новая кампания</h1><p>Заполни форму — объявление появится у пользователей PromptCash</p></div>
-      <div class="alert info">💡 Объявление проходит модерацию до 2 часов. После одобрения — запускается автоматически.</div>
       <div id="form-alert"></div>
 
       <div style="display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start">
@@ -163,7 +186,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
           <div class="card">
             <div class="card-title">📋 Основная информация</div>
             <div class="form-group">
-              <div class="form-label">Название кампании (только для вас) <span class="counter" id="cnt-name">0/50</span></div>
+              <div class="form-label">Название кампании <span class="counter" id="cnt-name">0/50</span></div>
               <input class="form-input" id="f-name" type="text" maxlength="50" placeholder="Например: Летняя акция 2026" oninput="cnt(this,'cnt-name',50)"/>
               <div class="form-hint">Видите только вы — для внутреннего учёта</div>
             </div>
@@ -173,7 +196,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
                 <input class="form-input" id="f-budget" type="number" min="1000" step="500" placeholder="Минимум 1 000 ₽" oninput="updBudget()" style="max-width:220px"/>
                 <span style="color:var(--mt);font-size:13px" id="budget-shows">— показов</span>
               </div>
-              <div class="form-hint">1 показ = 1 ₽. Средства списываются только за реальные показы.</div>
+              <div class="form-hint">1 показ = 1 ₽. Списание только за реальные показы.</div>
             </div>
           </div>
 
@@ -182,49 +205,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
             <div class="form-group">
               <div class="form-label">Заголовок <span class="counter" id="cnt-title">0/60</span></div>
               <input class="form-input" id="f-title" type="text" maxlength="60" placeholder="Создавайте быстрее с AI-инструментами" oninput="cnt(this,'cnt-title',60);updPreview()"/>
-              <div class="form-hint">Макс. 60 символов. Конкретный заголовок работает лучше общего.</div>
+              <div class="form-hint">Макс. 60 символов</div>
             </div>
             <div class="form-group">
               <div class="form-label">Описание <span class="counter" id="cnt-desc">0/120</span></div>
-              <textarea class="form-input form-textarea" id="f-desc" maxlength="120" placeholder="Полезные продукты для разработчиков и основателей." oninput="cnt(this,'cnt-desc',120);updPreview()"></textarea>
-              <div class="form-hint">Макс. 120 символов. Раскройте ценность предложения.</div>
+              <textarea class="form-input form-textarea" id="f-desc" maxlength="120" placeholder="Полезные продукты для разработчиков." oninput="cnt(this,'cnt-desc',120);updPreview()"></textarea>
+              <div class="form-hint">Макс. 120 символов</div>
             </div>
             <div class="form-grid">
               <div class="form-group">
-                <div class="form-label">Текст кнопки (CTA) <span class="counter" id="cnt-cta">0/20</span></div>
+                <div class="form-label">Текст кнопки <span class="counter" id="cnt-cta">0/20</span></div>
                 <input class="form-input" id="f-cta" type="text" maxlength="20" placeholder="Узнать больше" oninput="cnt(this,'cnt-cta',20);updPreview()"/>
-                <div class="form-hint">Макс. 20 символов. Глагол: «Попробовать», «Скачать».</div>
+                <div class="form-hint">Макс. 20 символов</div>
               </div>
               <div class="form-group">
                 <div class="form-label">URL назначения</div>
                 <input class="form-input" id="f-url" type="url" placeholder="https://yoursite.ru" oninput="valUrl(this);updPreview()"/>
                 <div class="form-hint" id="url-hint">Только https://</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">⚙️ Технические ограничения</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-              <div style="background:var(--bg3);border-radius:10px;padding:16px">
-                <div style="font-size:11px;color:var(--mt);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Лимиты</div>
-                <div style="font-size:13px;color:var(--mt);line-height:2.1">
-                  Заголовок: <strong style="color:var(--tx)">макс. 60 симв.</strong><br>
-                  Описание: <strong style="color:var(--tx)">макс. 120 симв.</strong><br>
-                  Кнопка CTA: <strong style="color:var(--tx)">макс. 20 симв.</strong><br>
-                  Изображения: <strong style="color:var(--tx)">не поддерживаются</strong><br>
-                  Формат: <strong style="color:var(--tx)">только текст</strong>
-                </div>
-              </div>
-              <div style="background:var(--bg3);border-radius:10px;padding:16px">
-                <div style="font-size:11px;color:var(--mt);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Запрещено</div>
-                <div style="font-size:13px;color:var(--mt);line-height:2.1">
-                  ❌ Обман и вводящий контент<br>
-                  ❌ Контент 18+<br>
-                  ❌ Брендинг OpenAI/ChatGPT<br>
-                  ❌ Кликбейт и ложные обещания<br>
-                  ❌ Финансовые пирамиды
-                </div>
               </div>
             </div>
           </div>
@@ -243,16 +240,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
             <div class="preview-desc" id="prev-desc"><span class="preview-placeholder">Описание появится здесь</span></div>
             <button class="preview-cta" id="prev-cta">Узнать больше</button>
             <div class="preview-foot"><span>Почему я вижу это?</span><span>×</span></div>
-          </div>
-          <div style="font-size:11px;color:var(--mt2);margin-top:12px;line-height:1.6">Карточка фиксированной ширины 320px. Появляется в правом нижнем углу ChatGPT.</div>
-          <div style="margin-top:20px;background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:16px">
-            <div style="font-size:12px;font-weight:600;color:var(--mt);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Советы</div>
-            <div style="font-size:12px;color:var(--mt);line-height:1.9">
-              ✅ Конкретный заголовок > общий<br>
-              ✅ Укажи выгоду: «Сэкономь 3 часа»<br>
-              ✅ CTA = глагол действия<br>
-              ✅ URL на релевантную страницу
-            </div>
           </div>
         </div>
       </div>
@@ -278,12 +265,49 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
         <div id="custom-topup" style="display:none;margin-bottom:16px">
           <input class="form-input" type="number" placeholder="Введите сумму (мин. 1 000 ₽)" min="1000" step="500" id="custom-amt" style="max-width:260px"/>
         </div>
-        <button class="btn btn-primary" onclick="doTopup()">Пополнить через ЮKassa →</button>
-        <div style="font-size:12px;color:var(--mt);margin-top:10px">Оплата картой или переводом. Деньги зачисляются моментально.</div>
+        <div class="alert warn">⏳ Онлайн-оплата скоро. Сейчас пополнение по запросу: напишите на ads@promptcash.io</div>
+        <button class="btn btn-primary" onclick="doTopup()">Запросить пополнение →</button>
       </div>
       <div class="card">
         <div class="card-title">📋 История транзакций</div>
         <div id="transactions-list"><div class="loading">Загрузка...</div></div>
+      </div>
+    </div>
+
+    <!-- ПРОФИЛЬ -->
+    <div class="page" id="page-profile">
+      <div class="ph"><h1>Профиль компании</h1><p>Информация о вашей компании и API-доступ</p></div>
+      <div id="profile-alert"></div>
+      <div class="card">
+        <div class="card-title">🏢 Данные компании</div>
+        <div class="form-group">
+          <div class="form-label">Название компании</div>
+          <input class="form-input" id="p-company" type="text" maxlength="80"/>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <div class="form-label">Сфера деятельности</div>
+            <select class="form-input" id="p-industry"></select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Сайт</div>
+            <input class="form-input" id="p-website" type="text" placeholder="https://yoursite.ru"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Email</div>
+          <input class="form-input" id="p-email" type="email" disabled/>
+          <div class="form-hint">Email изменить нельзя — обратитесь в поддержку</div>
+        </div>
+        <button class="btn btn-primary" onclick="saveProfile()">Сохранить изменения</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🔑 API-ключ</div>
+        <p style="color:var(--mt);font-size:13px;margin-bottom:14px">Используется для интеграций. Никому не передавайте этот ключ.</p>
+        <div class="apikey-box">
+          <span id="p-apikey">—</span>
+          <button class="copy-btn" onclick="copyApiKey()">Копировать</button>
+        </div>
       </div>
     </div>
 
@@ -293,35 +317,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
       <div class="card">
         <div class="card-title">📐 Требования к объявлениям</div>
         <table class="tbl">
-          <thead><tr><th>Поле</th><th>Лимит</th><th>Рекомендация</th></tr></thead>
+          <thead><tr><th>Поле</th><th>Лимит</th></tr></thead>
           <tbody>
-            <tr><td><strong>Заголовок</strong></td><td>Макс. 60 символов</td><td>40–55 символов — оптимально</td></tr>
-            <tr><td><strong>Описание</strong></td><td>Макс. 120 символов</td><td>80–110 символов — раскрывает выгоду</td></tr>
-            <tr><td><strong>Кнопка CTA</strong></td><td>Макс. 20 символов</td><td>Глагол + объект: «Попробовать бесплатно»</td></tr>
-            <tr><td><strong>URL</strong></td><td>Только https://</td><td>На конкретную страницу, не на главную</td></tr>
-            <tr><td><strong>Изображения</strong></td><td>Не поддерживаются</td><td>Только текст</td></tr>
+            <tr><td><strong>Заголовок</strong></td><td>Макс. 60 символов</td></tr>
+            <tr><td><strong>Описание</strong></td><td>Макс. 120 символов</td></tr>
+            <tr><td><strong>Кнопка CTA</strong></td><td>Макс. 20 символов</td></tr>
+            <tr><td><strong>URL</strong></td><td>Только https://</td></tr>
+            <tr><td><strong>Изображения</strong></td><td>Не поддерживаются</td></tr>
           </tbody>
         </table>
       </div>
       <div class="card">
-        <div class="card-title">💡 Как засчитывается показ</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div style="background:var(--bg3);border-radius:10px;padding:16px">
-            <div style="font-size:13px;font-weight:600;color:var(--g);margin-bottom:10px">✅ Засчитывается если:</div>
-            <div style="font-size:13px;color:var(--mt);line-height:2.1">Карточка видима ≥ 1.5 секунды<br>Вкладка браузера активна<br>Карточка в зоне видимости<br>Пользователь не закрыл раньше 1с</div>
-          </div>
-          <div style="background:var(--bg3);border-radius:10px;padding:16px">
-            <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:10px">❌ Не засчитывается если:</div>
-            <div style="font-size:13px;color:var(--mt);line-height:2.1">Вкладка в фоне<br>Карточка вне экрана<br>Пользователь закрыл быстро<br>Превышен дневной лимит</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
         <div class="card-title">📞 Связаться с нами</div>
         <div style="font-size:13px;color:var(--mt);line-height:2.2">
-          Email: <a href="mailto:ads@promptcash.io" style="color:var(--g)">ads@promptcash.io</a><br>
-          Telegram: <a href="#" style="color:var(--g)">@promptcash_support</a><br>
-          Отвечаем в рабочие дни 9:00–18:00 МСК, в течение 2 часов.
+          Email: <a href="mailto:ads@promptcash.io" style="color:var(--g)">ads@promptcash.io</a>
         </div>
       </div>
     </div>
@@ -329,12 +338,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
   </div>
 </div>
 
-<!-- MODAL TOPUP -->
 <div class="modal-overlay" id="modal-topup">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-topup')">×</button>
     <h2>Пополнить баланс</h2>
-    <p>Выберите сумму. Оплата через ЮKassa — карта или перевод.</p>
+    <p>Выберите сумму. Сейчас пополнение обрабатывается вручную.</p>
     <div class="topup-grid">
       <div class="topup-opt selected" onclick="selTopup(this,1000)"><div class="amt">1 000 ₽</div><div class="shows">1 000 показов</div></div>
       <div class="topup-opt" onclick="selTopup(this,3000)"><div class="amt">3 000 ₽</div><div class="shows">3 000 показов</div></div>
@@ -343,40 +351,60 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
       <div class="topup-opt" onclick="selTopup(this,25000)"><div class="amt">25 000 ₽</div><div class="shows">25 000 показов</div></div>
       <div class="topup-opt" onclick="selTopup(this,0)"><div class="amt">Своя</div><div class="shows">от 1 000 ₽</div></div>
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="doTopup()">Перейти к оплате →</button>
+    <button class="btn btn-primary" style="width:100%" onclick="doTopup()">Запросить пополнение →</button>
   </div>
 </div>
 
-<!-- MODAL SUCCESS -->
 <div class="modal-overlay" id="modal-success">
   <div class="modal" style="text-align:center">
     <div style="font-size:48px;margin-bottom:16px">🎉</div>
     <h2>Кампания создана!</h2>
-    <p>Объявление отправлено на модерацию. Обычно до 2 часов. После одобрения — показы начнутся автоматически.</p>
+    <p>Объявление активно и уже показывается пользователям PromptCash.</p>
     <button class="btn btn-primary" style="width:100%" onclick="closeModal('modal-success');showPage('campaigns');loadCampaigns()">Перейти к кампаниям</button>
   </div>
 </div>
 
 <script>
 const API = 'https://romptcash-backend.onrender.com';
-const API_KEY = '5adeb640-340e-4bc6-9a36-b55e659cf81e';
+let API_KEY = localStorage.getItem('pc_api_key');
+let ADVERTISER = JSON.parse(localStorage.getItem('pc_advertiser') || 'null');
+
+if (!API_KEY) {
+  document.getElementById('gate').style.display = 'flex';
+} else {
+  document.getElementById('app').style.display = 'flex';
+  init();
+}
+
+function logout() {
+  localStorage.removeItem('pc_api_key');
+  localStorage.removeItem('pc_advertiser');
+  window.location.href = 'auth.html';
+}
 
 async function apiFetch(path, opts = {}) {
   const res = await fetch(API + path, {
     ...opts,
     headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, ...(opts.headers || {}) }
   });
+  if (res.status === 401) { logout(); throw new Error('Сессия истекла'); }
   if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Ошибка'); }
   return res.json();
 }
 
-// INIT
 async function init() {
   try {
     const me = await apiFetch('/advertiser/me');
+    document.getElementById('sb-company-name').textContent = me.companyName || me.name;
+    document.getElementById('sb-company-ind').textContent = me.industry || '—';
     updateBalance(me.balanceRub);
     document.getElementById('bill-bal').textContent = me.balanceRub.toLocaleString('ru') + ' ₽';
     document.getElementById('bill-spent').textContent = me.totalSpentRub.toLocaleString('ru') + ' ₽';
+    document.getElementById('p-company').value = me.companyName || '';
+    document.getElementById('p-website').value = me.website || '';
+    document.getElementById('p-email').value = me.email || '';
+    document.getElementById('p-apikey').textContent = me.apiKey;
+    await loadIndustries(me.industry);
   } catch(e) { console.error('init error', e); }
 
   try {
@@ -392,6 +420,15 @@ async function init() {
   buildChart();
 }
 
+async function loadIndustries(current) {
+  try {
+    const res = await fetch(API + '/auth/industries');
+    const list = await res.json();
+    const sel = document.getElementById('p-industry');
+    sel.innerHTML = list.map(i => `<option value="${i}" ${i===current?'selected':''}>${i}</option>`).join('');
+  } catch(e) {}
+}
+
 function updateBalance(bal) {
   document.getElementById('sb-bal').textContent = bal.toLocaleString('ru') + ' ₽';
   document.getElementById('sb-shows').textContent = '≈ ' + bal.toLocaleString('ru') + ' показов осталось';
@@ -400,26 +437,17 @@ function updateBalance(bal) {
 async function loadCampaigns() {
   try {
     const camps = await apiFetch('/advertiser/campaigns');
-
-    // Dashboard
     const dashEl = document.getElementById('dash-campaigns');
-    if (camps.length === 0) {
-      dashEl.innerHTML = '<div class="loading">Нет активных кампаний. <button class="btn btn-primary btn-sm" onclick="showPage(\'new-campaign\')" style="margin-left:8px">+ Создать</button></div>';
-    } else {
-      dashEl.innerHTML = renderCampaignsTable(camps.slice(0, 3));
-    }
-
-    // Campaigns page
     const listEl = document.getElementById('campaigns-list');
     if (camps.length === 0) {
-      listEl.innerHTML = '<div class="loading" style="padding:40px">Нет кампаний. <button class="btn btn-primary btn-sm" onclick="showPage(\'new-campaign\')" style="margin-left:8px">+ Создать первую</button></div>';
+      const empty = '<div class="loading">Нет кампаний. <button class="btn btn-primary btn-sm" onclick="showPage(\'new-campaign\')" style="margin-left:8px">+ Создать первую</button></div>';
+      dashEl.innerHTML = empty;
+      listEl.innerHTML = empty;
     } else {
+      dashEl.innerHTML = renderCampaignsTable(camps.slice(0, 3));
       listEl.innerHTML = renderCampaignsTable(camps);
     }
-  } catch(e) {
-    console.error('campaigns error', e);
-    document.getElementById('dash-campaigns').innerHTML = '<div class="loading" style="color:var(--red)">Ошибка загрузки</div>';
-  }
+  } catch(e) { console.error('campaigns error', e); }
 }
 
 function renderCampaignsTable(camps) {
@@ -427,73 +455,45 @@ function renderCampaignsTable(camps) {
     const pct = Math.round((c.spent_usd / c.total_budget_usd) * 100);
     const budgetRub = Math.round(c.total_budget_usd * 75);
     const spentRub = Math.round(c.spent_usd * 75);
-    const statusBadge = c.status === 'active'
-      ? '<span class="badge active">● Активна</span>'
-      : c.status === 'paused'
-      ? '<span class="badge paused">⏸ На паузе</span>'
-      : '<span class="badge moderation">🕐 Модерация</span>';
+    const statusBadge = c.status === 'active' ? '<span class="badge active">● Активна</span>' : '<span class="badge paused">⏸ На паузе</span>';
     const pauseBtn = c.status === 'active'
       ? `<button class="btn btn-secondary btn-sm" onclick="toggleCamp('${c.id}','paused')">⏸</button>`
       : `<button class="btn btn-secondary btn-sm" onclick="toggleCamp('${c.id}','active')">▶️</button>`;
     return `<tr>
-      <td><div style="font-weight:600">${c.title}</div><div style="font-size:11px;color:var(--mt)">${c.advertiser_name}</div></td>
+      <td><div style="font-weight:600">${c.title}</div></td>
       <td>${statusBadge}</td>
-      <td>
-        <div>${budgetRub.toLocaleString('ru')} ₽</div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:${Math.min(pct,100)}%"></div></div>
-        <div style="font-size:11px;color:var(--mt);margin-top:2px">${spentRub.toLocaleString('ru')} ₽ потрачено</div>
-      </td>
-      <td>${c.advertiser_name}</td>
+      <td><div>${budgetRub.toLocaleString('ru')} ₽</div><div class="progress-wrap"><div class="progress-bar" style="width:${Math.min(pct,100)}%"></div></div><div style="font-size:11px;color:var(--mt);margin-top:2px">${spentRub.toLocaleString('ru')} ₽ потрачено</div></td>
       <td><div class="btn-group">${pauseBtn}</div></td>
     </tr>`;
   }).join('');
-
-  return `<table class="tbl">
-    <thead><tr><th>Объявление</th><th>Статус</th><th>Бюджет</th><th>Рекламодатель</th><th>Действия</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
+  return `<table class="tbl"><thead><tr><th>Объявление</th><th>Статус</th><th>Бюджет</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 async function toggleCamp(id, status) {
-  try {
-    await apiFetch('/advertiser/campaigns/' + id, { method: 'PATCH', body: JSON.stringify({ status }) });
-    loadCampaigns();
-  } catch(e) { alert('Ошибка: ' + e.message); }
+  try { await apiFetch('/advertiser/campaigns/' + id, { method: 'PATCH', body: JSON.stringify({ status }) }); loadCampaigns(); }
+  catch(e) { alert('Ошибка: ' + e.message); }
 }
 
 async function loadTransactions() {
   try {
     const txs = await apiFetch('/advertiser/transactions');
     const el = document.getElementById('transactions-list');
-    if (txs.length === 0) {
-      el.innerHTML = '<div class="loading">Нет транзакций</div>';
-      return;
-    }
+    if (txs.length === 0) { el.innerHTML = '<div class="loading">Нет транзакций</div>'; return; }
     const rows = txs.map(t => {
       const isPlus = t.type === 'topup';
-      const amt = isPlus ? '+' + t.amount_rub.toLocaleString('ru') + ' ₽' : t.amount_rub.toLocaleString('ru') + ' ₽';
       const color = isPlus ? 'var(--g)' : 'var(--red)';
       const date = new Date(t.created_at).toLocaleDateString('ru');
-      return `<tr>
-        <td style="color:var(--mt)">${date}</td>
-        <td>${t.description || (isPlus ? 'Пополнение' : 'Списание')}</td>
-        <td style="color:${color};font-weight:600">${amt}</td>
-        <td>${t.balance_after.toLocaleString('ru')} ₽</td>
-      </tr>`;
+      return `<tr><td style="color:var(--mt)">${date}</td><td>${t.description||(isPlus?'Пополнение':'Списание')}</td><td style="color:${color};font-weight:600">${t.amount_rub.toLocaleString('ru')} ₽</td><td>${t.balance_after.toLocaleString('ru')} ₽</td></tr>`;
     }).join('');
-    el.innerHTML = `<table class="tbl">
-      <thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th><th>Баланс после</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-  } catch(e) { console.error('tx error', e); }
+    el.innerHTML = `<table class="tbl"><thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th><th>Баланс после</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch(e) {}
 }
 
-// FORM
 function cnt(input, id, max) {
   const l = input.value.length;
   const el = document.getElementById(id);
   el.textContent = l + '/' + max;
-  el.className = 'counter' + (l >= max ? ' over' : l > max * 0.85 ? ' warn' : '');
+  el.className = 'counter' + (l >= max ? ' over' : l > max*0.85 ? ' warn' : '');
 }
 function updBudget() {
   const v = parseInt(document.getElementById('f-budget').value) || 0;
@@ -502,19 +502,11 @@ function updBudget() {
 function valUrl(input) {
   const hint = document.getElementById('url-hint');
   if (input.value && !input.value.startsWith('https://')) {
-    hint.textContent = '⚠️ URL должен начинаться с https://';
-    hint.className = 'form-hint error';
-    input.style.borderColor = 'var(--red)';
-  } else {
-    hint.textContent = 'Только https://';
-    hint.className = 'form-hint';
-    input.style.borderColor = '';
-  }
+    hint.textContent = '⚠️ URL должен начинаться с https://'; hint.className = 'form-hint error'; input.style.borderColor = 'var(--red)';
+  } else { hint.textContent = 'Только https://'; hint.className = 'form-hint'; input.style.borderColor = ''; }
 }
 function updPreview() {
-  const t = document.getElementById('f-title').value;
-  const d = document.getElementById('f-desc').value;
-  const c = document.getElementById('f-cta').value;
+  const t = document.getElementById('f-title').value, d = document.getElementById('f-desc').value, c = document.getElementById('f-cta').value;
   document.getElementById('prev-title').innerHTML = t || '<span class="preview-placeholder">Заголовок появится здесь</span>';
   document.getElementById('prev-desc').innerHTML = d || '<span class="preview-placeholder">Описание появится здесь</span>';
   document.getElementById('prev-cta').textContent = c || 'Узнать больше';
@@ -528,91 +520,84 @@ async function submitCampaign() {
   const url = document.getElementById('f-url').value;
   const budget = parseInt(document.getElementById('f-budget').value);
   const alertEl = document.getElementById('form-alert');
-
   alertEl.innerHTML = '';
 
-  if (!title) return showAlert('Заполните заголовок', 'warn');
-  if (!desc) return showAlert('Заполните описание', 'warn');
-  if (!url || !url.startsWith('https://')) return showAlert('Введите корректный URL (https://)', 'warn');
-  if (!budget || budget < 1000) return showAlert('Минимальный бюджет — 1 000 ₽', 'warn');
+  if (!title) return alertEl.innerHTML = '<div class="alert warn">Заполните заголовок</div>';
+  if (!desc) return alertEl.innerHTML = '<div class="alert warn">Заполните описание</div>';
+  if (!url || !url.startsWith('https://')) return alertEl.innerHTML = '<div class="alert warn">Введите корректный URL (https://)</div>';
+  if (!budget || budget < 1000) return alertEl.innerHTML = '<div class="alert warn">Минимальный бюджет — 1 000 ₽</div>';
 
   const btn = document.getElementById('submit-btn');
-  btn.textContent = 'Создаём...';
-  btn.disabled = true;
-
+  btn.textContent = 'Создаём...'; btn.disabled = true;
   try {
-    await apiFetch('/advertiser/campaigns', {
-      method: 'POST',
-      body: JSON.stringify({ campaignName: name, title, description: desc, cta, url, budgetRub: budget })
-    });
-    btn.textContent = '🚀 Создать кампанию';
-    btn.disabled = false;
-    // Сбрасываем форму
-    ['f-name','f-title','f-desc','f-cta','f-url','f-budget'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
+    await apiFetch('/advertiser/campaigns', { method: 'POST', body: JSON.stringify({ campaignName: name, title, description: desc, cta, url, budgetRub: budget }) });
+    btn.textContent = '🚀 Создать кампанию'; btn.disabled = false;
+    ['f-name','f-title','f-desc','f-cta','f-url','f-budget'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     updPreview();
     openModal('modal-success');
-    // Обновляем баланс
     const me = await apiFetch('/advertiser/me');
     updateBalance(me.balanceRub);
   } catch(e) {
-    btn.textContent = '🚀 Создать кампанию';
-    btn.disabled = false;
-    showAlert('Ошибка: ' + e.message, 'error');
+    btn.textContent = '🚀 Создать кампанию'; btn.disabled = false;
+    alertEl.innerHTML = `<div class="alert error">Ошибка: ${e.message}</div>`;
   }
 }
 
-function showAlert(msg, type) {
-  document.getElementById('form-alert').innerHTML = `<div class="alert ${type}">${msg}</div>`;
+async function saveProfile() {
+  const companyName = document.getElementById('p-company').value;
+  const industry = document.getElementById('p-industry').value;
+  const website = document.getElementById('p-website').value;
+  const alertEl = document.getElementById('profile-alert');
+  try {
+    await apiFetch('/advertiser/me', { method: 'PATCH', body: JSON.stringify({ companyName, industry, website }) });
+    alertEl.innerHTML = '<div class="alert success">✓ Профиль обновлён</div>';
+    document.getElementById('sb-company-name').textContent = companyName;
+    document.getElementById('sb-company-ind').textContent = industry;
+  } catch(e) {
+    alertEl.innerHTML = `<div class="alert error">Ошибка: ${e.message}</div>`;
+  }
 }
 
-// NAV
+function copyApiKey() {
+  const key = document.getElementById('p-apikey').textContent;
+  navigator.clipboard.writeText(key);
+  event.target.textContent = 'Скопировано!';
+  setTimeout(() => event.target.textContent = 'Копировать', 1500);
+}
+
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  const map = {dashboard:0, campaigns:1, 'new-campaign':2, billing:3, help:4};
+  const map = {dashboard:0, campaigns:1, 'new-campaign':2, billing:3, profile:4, help:5};
   if (map[id] !== undefined) document.querySelectorAll('.sb-item')[map[id]].classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// MODALS
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-});
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
 
-// TOPUP
 let selAmt = 1000;
 function selTopup(el, amt) {
   document.querySelectorAll('.topup-opt').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  selAmt = amt;
+  el.classList.add('selected'); selAmt = amt;
   const cd = document.getElementById('custom-topup');
   if (cd) cd.style.display = amt === 0 ? 'block' : 'none';
 }
 function doTopup() {
   const amt = selAmt || parseInt(document.getElementById('custom-amt')?.value) || 0;
   if (amt < 1000) { alert('Минимальная сумма — 1 000 ₽'); return; }
-  alert(`Переход к оплате ${amt.toLocaleString('ru')} ₽ через ЮKassa.\n\nВ продакшн-версии здесь будет форма оплаты.`);
+  alert(`Заявка на пополнение ${amt.toLocaleString('ru')} ₽ отправлена.\n\nНапишите на ads@promptcash.io для оплаты. Скоро добавим автоматическую оплату через ЮKassa.`);
   closeModal('modal-topup');
 }
 
-// CHART (заглушка с реальными данными если есть)
 function buildChart() {
   const chart = document.getElementById('chart');
-  const vals = Array.from({length:30}, () => Math.floor(Math.random() * 500 + 100));
+  const vals = Array.from({length:30}, () => Math.floor(Math.random()*500+100));
   const max = Math.max(...vals);
-  chart.innerHTML = vals.map(v =>
-    `<div class="bar" style="height:${Math.round(v/max*100)}%" title="${v} показов"></div>`
-  ).join('');
+  chart.innerHTML = vals.map(v => `<div class="bar" style="height:${Math.round(v/max*100)}%" title="${v} показов"></div>`).join('');
 }
-
-// START
-init();
 </script>
 </body>
 </html>
