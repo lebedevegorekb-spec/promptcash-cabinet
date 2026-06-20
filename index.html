@@ -49,6 +49,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
 .tbl td{padding:12px 14px;border-bottom:1px solid var(--bd);font-size:13px;vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr:hover td{background:var(--bg3)}
+.tbl .clickable{cursor:pointer;color:var(--tx);text-decoration:none}
+.tbl .clickable:hover{color:var(--g);text-decoration:underline}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
 .badge.active{background:rgba(16,163,127,.15);color:var(--g)}
 .badge.paused{background:rgba(245,166,35,.12);color:var(--yellow)}
@@ -82,7 +84,8 @@ select.form-input{cursor:pointer}
 .progress-bar{height:100%;background:var(--g);border-radius:4px}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:480px;width:100%;position:relative}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:480px;width:100%;position:relative;max-height:90vh;overflow-y:auto}
+.modal.wide{max-width:600px}
 .modal h2{font-size:18px;font-weight:800;margin-bottom:8px}
 .modal p{color:var(--mt);font-size:13px;margin-bottom:24px;line-height:1.6}
 .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--mt);font-size:20px;cursor:pointer}
@@ -105,6 +108,14 @@ select.form-input{cursor:pointer}
 .apikey-box span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .copy-btn{background:var(--bg2);border:1px solid var(--bd2);color:var(--mt);border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif}
 .copy-btn:hover{color:var(--g);border-color:var(--g)}
+.detail-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.detail-stat{background:var(--bg3);border-radius:10px;padding:14px}
+.detail-stat .v{font-size:22px;font-weight:800;color:var(--g)}
+.detail-stat .l{font-size:11px;color:var(--mt);margin-top:2px}
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.detail-row .k{color:var(--mt)}
+.detail-row .v{color:var(--tx);text-align:right;max-width:60%;word-break:break-word}
 @media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.stats-row{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -167,7 +178,7 @@ select.form-input{cursor:pointer}
     <div class="page" id="page-campaigns">
       <div class="ph">
         <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div><h1>Кампании</h1><p>Управление рекламными кампаниями</p></div>
+          <div><h1>Кампании</h1><p>Управление рекламными кампаниями. Кликните на название для деталей.</p></div>
           <button class="btn btn-primary" onclick="showPage('new-campaign')">+ Новая кампания</button>
         </div>
       </div>
@@ -196,7 +207,7 @@ select.form-input{cursor:pointer}
                 <input class="form-input" id="f-budget" type="number" min="1000" step="500" placeholder="Минимум 1 000 ₽" oninput="updBudget()" style="max-width:220px"/>
                 <span style="color:var(--mt);font-size:13px" id="budget-shows">— показов</span>
               </div>
-              <div class="form-hint">1 показ = 1 ₽. Списание только за реальные показы.</div>
+              <div class="form-hint">1 показ = 1 ₽. Это лимит — реальное списание идёт за каждый показ с вашего общего баланса.</div>
             </div>
           </div>
 
@@ -364,6 +375,39 @@ select.form-input{cursor:pointer}
   </div>
 </div>
 
+<!-- MODAL: ДЕТАЛИ КАМПАНИИ -->
+<div class="modal-overlay" id="modal-campaign-detail">
+  <div class="modal wide">
+    <button class="modal-close" onclick="closeModal('modal-campaign-detail')">×</button>
+    <h2 id="detail-title">—</h2>
+    <p id="detail-status"></p>
+
+    <div class="detail-stats">
+      <div class="detail-stat"><div class="v" id="detail-impressions">—</div><div class="l">Показов</div></div>
+      <div class="detail-stat"><div class="v" id="detail-clicks">—</div><div class="l">Кликов</div></div>
+      <div class="detail-stat"><div class="v" id="detail-ctr">—</div><div class="l">CTR</div></div>
+      <div class="detail-stat"><div class="v" id="detail-cpc">—</div><div class="l">Цена клика</div></div>
+      <div class="detail-stat"><div class="v" id="detail-spent">—</div><div class="l">Потрачено</div></div>
+      <div class="detail-stat"><div class="v" id="detail-budget-stat">—</div><div class="l">Бюджет</div></div>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mt);margin-bottom:6px">
+        <span>Использовано бюджета кампании</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" id="detail-progress" style="width:0%"></div></div>
+    </div>
+
+    <div style="background:var(--bg3);border-radius:10px;padding:16px;margin-bottom:20px">
+      <div class="detail-row"><span class="k">Описание</span><span class="v" id="detail-desc">—</span></div>
+      <div class="detail-row"><span class="k">Текст кнопки</span><span class="v" id="detail-cta">—</span></div>
+      <div class="detail-row"><span class="k">Ссылка</span><a class="v" id="detail-url" href="#" target="_blank" style="color:var(--g)">—</a></div>
+    </div>
+
+    <button class="btn btn-secondary" id="detail-pause-btn" style="width:100%">⏸ Поставить на паузу</button>
+  </div>
+</div>
+
 <script>
 const API = 'https://romptcash-backend.onrender.com';
 let API_KEY = localStorage.getItem('pc_api_key');
@@ -460,13 +504,52 @@ function renderCampaignsTable(camps) {
       ? `<button class="btn btn-secondary btn-sm" onclick="toggleCamp('${c.id}','paused')">⏸</button>`
       : `<button class="btn btn-secondary btn-sm" onclick="toggleCamp('${c.id}','active')">▶️</button>`;
     return `<tr>
-      <td><div style="font-weight:600">${c.title}</div></td>
+      <td><a class="clickable" onclick="openCampaignDetail('${c.id}')" style="font-weight:600">${c.title}</a></td>
       <td>${statusBadge}</td>
+      <td>${(c.impressions ?? 0).toLocaleString('ru')}</td>
+      <td>${(c.clicks ?? 0).toLocaleString('ru')}</td>
       <td><div>${budgetRub.toLocaleString('ru')} ₽</div><div class="progress-wrap"><div class="progress-bar" style="width:${Math.min(pct,100)}%"></div></div><div style="font-size:11px;color:var(--mt);margin-top:2px">${spentRub.toLocaleString('ru')} ₽ потрачено</div></td>
       <td><div class="btn-group">${pauseBtn}</div></td>
     </tr>`;
   }).join('');
-  return `<table class="tbl"><thead><tr><th>Объявление</th><th>Статус</th><th>Бюджет</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<table class="tbl"><thead><tr><th>Объявление</th><th>Статус</th><th>Показы</th><th>Клики</th><th>Бюджет</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function openCampaignDetail(id) {
+  try {
+    const data = await apiFetch('/advertiser/campaigns/' + id);
+    const c = data.campaign;
+    const st = data.stats;
+
+    document.getElementById('detail-title').textContent = c.title;
+    document.getElementById('detail-status').innerHTML = c.status === 'active'
+      ? '<span class="badge active">● Активна</span>'
+      : '<span class="badge paused">⏸ На паузе</span>';
+    document.getElementById('detail-impressions').textContent = st.impressions.toLocaleString('ru');
+    document.getElementById('detail-clicks').textContent = st.clicks.toLocaleString('ru');
+    document.getElementById('detail-ctr').textContent = st.ctr + '%';
+    document.getElementById('detail-cpc').textContent = st.clicks > 0 ? st.cpcRub.toLocaleString('ru') + ' ₽' : '—';
+    document.getElementById('detail-spent').textContent = st.spentRub.toLocaleString('ru') + ' ₽';
+    document.getElementById('detail-budget-stat').textContent = st.budgetRub.toLocaleString('ru') + ' ₽';
+    document.getElementById('detail-desc').textContent = c.description;
+    document.getElementById('detail-cta').textContent = c.cta;
+    document.getElementById('detail-url').textContent = c.url;
+    document.getElementById('detail-url').href = c.url;
+
+    const pct = st.budgetRub > 0 ? Math.min(Math.round((st.spentRub / st.budgetRub) * 100), 100) : 0;
+    document.getElementById('detail-progress').style.width = pct + '%';
+
+    const btn = document.getElementById('detail-pause-btn');
+    btn.textContent = c.status === 'active' ? '⏸ Поставить на паузу' : '▶️ Возобновить';
+    btn.onclick = async () => {
+      await toggleCamp(c.id, c.status === 'active' ? 'paused' : 'active');
+      openCampaignDetail(c.id);
+    };
+
+    openModal('modal-campaign-detail');
+  } catch(e) {
+    alert('Ошибка: ' + e.message);
+  }
 }
 
 async function toggleCamp(id, status) {
@@ -483,7 +566,8 @@ async function loadTransactions() {
       const isPlus = t.type === 'topup';
       const color = isPlus ? 'var(--g)' : 'var(--red)';
       const date = new Date(t.created_at).toLocaleDateString('ru');
-      return `<tr><td style="color:var(--mt)">${date}</td><td>${t.description||(isPlus?'Пополнение':'Списание')}</td><td style="color:${color};font-weight:600">${t.amount_rub.toLocaleString('ru')} ₽</td><td>${t.balance_after.toLocaleString('ru')} ₽</td></tr>`;
+      const desc = t.description || (isPlus ? 'Пополнение баланса' : 'Списание');
+      return `<tr><td style="color:var(--mt)">${date}</td><td>${desc}</td><td style="color:${color};font-weight:600">${t.amount_rub.toLocaleString('ru')} ₽</td><td>${t.balance_after.toLocaleString('ru')} ₽</td></tr>`;
     }).join('');
     el.innerHTML = `<table class="tbl"><thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th><th>Баланс после</th></tr></thead><tbody>${rows}</tbody></table>`;
   } catch(e) {}
