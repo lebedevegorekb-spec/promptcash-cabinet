@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PromptCash — Подтверждение email</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#f0f0f0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.wrap{max-width:440px;width:100%;text-align:center}
+.logo{font-size:22px;font-weight:800;margin-bottom:32px}
+.logo em{color:#10a37f;font-style:normal}
+.card{background:#111;border:1px solid #252525;border-radius:16px;padding:40px 32px}
+.icon{font-size:48px;margin-bottom:20px}
+h2{font-size:20px;font-weight:800;margin-bottom:12px}
+p{color:#888;font-size:14px;line-height:1.6;margin-bottom:24px}
+.btn{display:inline-block;background:#10a37f;color:#fff;text-decoration:none;padding:12px 28px;border-radius:9px;font-weight:700;font-size:14px;border:none;cursor:pointer;font-family:'Inter',sans-serif}
+.btn:hover{background:#12c49a}
+.spinner{width:32px;height:32px;border:3px solid #252525;border-top-color:#10a37f;border-radius:50%;margin:0 auto 20px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">💰 Prompt<em>Cash</em></div>
+  <div class="card" id="content">
+    <div class="spinner"></div>
+    <h2>Проверяем ссылку...</h2>
+    <p>Подождите немного</p>
+  </div>
+</div>
+
+<script>
+const API = 'https://romptcash-backend.onrender.com';
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token');
+
+async function verify() {
+  const content = document.getElementById('content');
+
+  if (!token) {
+    content.innerHTML = `
+      <div class="icon">⚠️</div>
+      <h2>Ссылка недействительна</h2>
+      <p>Токен подтверждения не найден в ссылке.</p>
+      <a href="auth.html" class="btn">Вернуться к входу</a>
+    `;
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/auth/verify?token=${token}`);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error);
+
+    if (data.alreadyVerified) {
+      content.innerHTML = `
+        <div class="icon">✅</div>
+        <h2>Email уже подтверждён</h2>
+        <p>Вы можете войти в кабинет.</p>
+        <a href="auth.html" class="btn">Войти</a>
+      `;
+      return;
+    }
+
+    // Автоматически логиним
+    if (data.apiKey) {
+      localStorage.setItem('pc_api_key', data.apiKey);
+      localStorage.setItem('pc_advertiser', JSON.stringify(data.advertiser));
+    }
+
+    content.innerHTML = `
+      <div class="icon">🎉</div>
+      <h2>Email подтверждён!</h2>
+      <p>Переходим в рекламный кабинет...</p>
+    `;
+    setTimeout(() => window.location.href = 'index.html', 1200);
+  } catch (e) {
+    content.innerHTML = `
+      <div class="icon">❌</div>
+      <h2>Не удалось подтвердить</h2>
+      <p>${e.message}</p>
+      <a href="auth.html" class="btn">Вернуться к входу</a>
+    `;
+  }
+}
+
+verify();
+</script>
+</body>
+</html>

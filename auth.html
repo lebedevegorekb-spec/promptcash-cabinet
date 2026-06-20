@@ -27,12 +27,21 @@ select.fi{cursor:pointer}
 .btn{width:100%;background:#10a37f;color:#fff;border:none;padding:13px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px}
 .btn:hover{background:#12c49a}
 .btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-secondary{background:#1a1a1a;border:1px solid #333}
+.btn-secondary:hover{background:#222}
 .hint{font-size:11px;color:#555;margin-top:6px;line-height:1.5}
 .alert{padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:18px;line-height:1.5}
 .alert.error{background:rgba(230,85,85,.1);border:1px solid rgba(230,85,85,.2);color:#e55}
 .alert.success{background:rgba(16,163,127,.1);border:1px solid rgba(16,163,127,.2);color:#10a37f}
 .back-link{display:block;text-align:center;margin-top:20px;color:#666;font-size:13px;text-decoration:none}
 .back-link:hover{color:#888}
+
+/* PENDING SCREEN */
+.pending{display:none;text-align:center}
+.pending .icon{font-size:48px;margin-bottom:16px}
+.pending h2{font-size:18px;font-weight:800;margin-bottom:10px}
+.pending p{color:#888;font-size:13px;line-height:1.6;margin-bottom:20px}
+.pending strong{color:#fff}
 </style>
 </head>
 <body>
@@ -42,52 +51,63 @@ select.fi{cursor:pointer}
   <div class="subtitle">Рекламный кабинет</div>
 
   <div class="card">
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('login')">Вход</button>
-      <button class="tab" onclick="switchTab('register')">Регистрация</button>
+    <div id="auth-forms">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('login')">Вход</button>
+        <button class="tab" onclick="switchTab('register')">Регистрация</button>
+      </div>
+
+      <div id="alert-box"></div>
+
+      <!-- LOGIN -->
+      <div class="form active" id="form-login">
+        <div class="fg">
+          <label class="fl">Email</label>
+          <input class="fi" type="email" id="login-email" placeholder="company@example.ru"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Пароль</label>
+          <input class="fi" type="password" id="login-password" placeholder="••••••••"/>
+        </div>
+        <button class="btn" onclick="doLogin()" id="login-btn">Войти в кабинет</button>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="form" id="form-register">
+        <div class="fg">
+          <label class="fl">Название компании</label>
+          <input class="fi" type="text" id="reg-company" placeholder="ООО Ромашка" maxlength="80"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Сфера деятельности</label>
+          <select class="fi" id="reg-industry">
+            <option value="">Загрузка...</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl">Сайт (необязательно)</label>
+          <input class="fi" type="text" id="reg-website" placeholder="https://yoursite.ru"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Email</label>
+          <input class="fi" type="email" id="reg-email" placeholder="company@example.ru"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Пароль</label>
+          <input class="fi" type="password" id="reg-password" placeholder="Минимум 8 символов"/>
+          <div class="hint">Минимум 8 символов</div>
+        </div>
+        <button class="btn" onclick="doRegister()" id="reg-btn">Создать аккаунт</button>
+      </div>
     </div>
 
-    <div id="alert-box"></div>
-
-    <!-- LOGIN -->
-    <div class="form active" id="form-login">
-      <div class="fg">
-        <label class="fl">Email</label>
-        <input class="fi" type="email" id="login-email" placeholder="company@example.ru"/>
-      </div>
-      <div class="fg">
-        <label class="fl">Пароль</label>
-        <input class="fi" type="password" id="login-password" placeholder="••••••••"/>
-      </div>
-      <button class="btn" onclick="doLogin()" id="login-btn">Войти в кабинет</button>
-    </div>
-
-    <!-- REGISTER -->
-    <div class="form" id="form-register">
-      <div class="fg">
-        <label class="fl">Название компании</label>
-        <input class="fi" type="text" id="reg-company" placeholder="ООО Ромашка" maxlength="80"/>
-      </div>
-      <div class="fg">
-        <label class="fl">Сфера деятельности</label>
-        <select class="fi" id="reg-industry">
-          <option value="">Загрузка...</option>
-        </select>
-      </div>
-      <div class="fg">
-        <label class="fl">Сайт (необязательно)</label>
-        <input class="fi" type="text" id="reg-website" placeholder="https://yoursite.ru"/>
-      </div>
-      <div class="fg">
-        <label class="fl">Email</label>
-        <input class="fi" type="email" id="reg-email" placeholder="company@example.ru"/>
-      </div>
-      <div class="fg">
-        <label class="fl">Пароль</label>
-        <input class="fi" type="password" id="reg-password" placeholder="Минимум 8 символов"/>
-        <div class="hint">Минимум 8 символов</div>
-      </div>
-      <button class="btn" onclick="doRegister()" id="reg-btn">Создать аккаунт</button>
+    <!-- PENDING VERIFICATION SCREEN -->
+    <div class="pending" id="pending-screen">
+      <div class="icon">📧</div>
+      <h2>Проверьте почту</h2>
+      <p>Мы отправили письмо на <strong id="pending-email"></strong> со ссылкой для подтверждения. Перейдите по ней, чтобы получить доступ к кабинету.</p>
+      <p style="font-size:12px">Не пришло письмо? Проверьте папку «Спам» или запросите повторно.</p>
+      <button class="btn btn-secondary" onclick="resendVerification()" id="resend-btn">Отправить письмо повторно</button>
     </div>
   </div>
 
@@ -96,7 +116,8 @@ select.fi{cursor:pointer}
 
 <script>
 const API = 'https://romptcash-backend.onrender.com';
-const CABINET_URL = 'https://promptcash-cabinet.onrender.com';
+const CABINET_URL = 'index.html';
+let pendingEmail = '';
 
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -110,6 +131,13 @@ function showAlert(msg, type) {
   document.getElementById('alert-box').innerHTML = `<div class="alert ${type}">${msg}</div>`;
 }
 
+function showPendingScreen(email) {
+  pendingEmail = email;
+  document.getElementById('auth-forms').style.display = 'none';
+  document.getElementById('pending-screen').style.display = 'block';
+  document.getElementById('pending-email').textContent = email;
+}
+
 async function loadIndustries() {
   try {
     const res = await fetch(API + '/auth/industries');
@@ -117,9 +145,7 @@ async function loadIndustries() {
     const sel = document.getElementById('reg-industry');
     sel.innerHTML = '<option value="">Выберите сферу</option>' +
       industries.map(i => `<option value="${i}">${i}</option>`).join('');
-  } catch(e) {
-    console.error('industries error', e);
-  }
+  } catch(e) { console.error('industries error', e); }
 }
 loadIndustries();
 
@@ -139,7 +165,14 @@ async function doLogin() {
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
+
+    if (!res.ok) {
+      if (data.needsVerification) {
+        showPendingScreen(email);
+        return;
+      }
+      throw new Error(data.error);
+    }
 
     localStorage.setItem('pc_api_key', data.apiKey);
     localStorage.setItem('pc_advertiser', JSON.stringify(data.advertiser));
@@ -177,6 +210,11 @@ async function doRegister() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
 
+    if (data.needsVerification) {
+      showPendingScreen(email);
+      return;
+    }
+
     localStorage.setItem('pc_api_key', data.apiKey);
     localStorage.setItem('pc_advertiser', JSON.stringify(data.advertiser));
     showAlert('Регистрация успешна! Переход в кабинет...', 'success');
@@ -185,6 +223,26 @@ async function doRegister() {
     showAlert(e.message, 'error');
     btn.disabled = false;
     btn.textContent = 'Создать аккаунт';
+  }
+}
+
+async function resendVerification() {
+  const btn = document.getElementById('resend-btn');
+  btn.disabled = true;
+  btn.textContent = 'Отправляем...';
+  try {
+    const res = await fetch(API + '/auth/resend-verification', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email: pendingEmail })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    btn.textContent = 'Письмо отправлено ✓';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'Отправить письмо повторно'; }, 3000);
+  } catch(e) {
+    btn.textContent = 'Ошибка: ' + e.message;
+    btn.disabled = false;
   }
 }
 </script>
