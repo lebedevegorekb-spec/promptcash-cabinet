@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PromptCash — Админка</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#10a37f;--gl:#12c49a;
+  --bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;
+  --bd:#252525;--bd2:#333;
+  --tx:#f0f0f0;--mt:#777;--mt2:#444;
+  --red:#e55;--yellow:#f5a623;--blue:#5b9eff;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.6;min-height:100vh}
+.gate{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center}
+.gate-box{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:36px;max-width:380px;width:100%}
+.gate-box h2{font-size:18px;font-weight:800;margin-bottom:16px}
+.gate-box input{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:11px 14px;color:var(--tx);font-size:14px;outline:none;margin-bottom:12px;font-family:'Inter',sans-serif}
+.gate-box button{width:100%;background:var(--g);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.gate-err{color:var(--red);font-size:12px;margin-top:8px}
+
+.layout{display:flex;min-height:100vh}
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--bd);flex-shrink:0;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:10}
+.main{margin-left:220px;flex:1;padding:32px;max-width:1300px}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--bd);font-size:16px;font-weight:800}
+.sb-logo em{color:var(--g);font-style:normal}
+.sb-nav{padding:12px 8px;flex:1}
+.sb-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--mt);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
+.sb-item:hover,.sb-item.active{background:var(--bg3);color:var(--tx)}
+.sb-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+
+.page{display:none}.page.active{display:block}
+.ph{margin-bottom:24px}
+.ph h1{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.ph p{color:var(--mt);font-size:13px}
+
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:24px;margin-bottom:20px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:16px}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stat-box{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:18px}
+.stat-box .val{font-size:24px;font-weight:800;color:var(--g);letter-spacing:-1px;line-height:1}
+.stat-box .lbl{font-size:11px;color:var(--mt);margin-top:6px;text-transform:uppercase;letter-spacing:0.5px}
+.stat-box.warn .val{color:var(--yellow)}
+.stat-box.danger .val{color:var(--red)}
+
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:11px;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:0.5px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--bd);font-size:13px;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg3)}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge.active{background:rgba(16,163,127,.15);color:var(--g)}
+.badge.paused{background:rgba(245,166,35,.12);color:var(--yellow)}
+.badge.pending_review{background:rgba(91,158,255,.12);color:var(--blue)}
+.badge.rejected{background:rgba(230,85,85,.12);color:var(--red)}
+.badge.blocked{background:rgba(230,85,85,.12);color:var(--red)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s}
+.btn-primary{background:var(--g);color:#fff}.btn-primary:hover{background:var(--gl)}
+.btn-danger{background:rgba(230,85,85,.12);color:var(--red);border:1px solid rgba(230,85,85,.25)}.btn-danger:hover{background:rgba(230,85,85,.22)}
+.btn-secondary{background:var(--bg3);color:var(--tx);border:1px solid var(--bd2)}.btn-secondary:hover{border-color:var(--g);color:var(--g)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+
+.filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filters select,.filters input{background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--tx);font-size:13px;font-family:'Inter',sans-serif;outline:none}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:600px;width:100%;position:relative;max-height:90vh;overflow-y:auto}
+.modal h2{font-size:18px;font-weight:800;margin-bottom:8px}
+.modal p{color:var(--mt);font-size:13px;margin-bottom:20px;line-height:1.6}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--mt);font-size:20px;cursor:pointer}
+.modal textarea{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;color:var(--tx);font-size:14px;font-family:'Inter',sans-serif;outline:none;min-height:90px;resize:vertical;margin-bottom:14px}
+.modal input[type=number]{width:100%;background:var(--bg3);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;color:var(--tx);font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:14px}
+
+.ad-preview-mini{background:#fff;border-radius:8px;padding:10px 12px;font-family:-apple-system,sans-serif;color:#111;margin-bottom:16px}
+.ad-preview-mini .t{font-size:13px;font-weight:700;margin-bottom:2px}
+.ad-preview-mini .d{font-size:12px;color:#555}
+.ad-preview-mini img{width:100%;max-width:280px;height:auto;border-radius:6px;margin-bottom:8px;display:block}
+
+.loading{color:var(--mt);font-size:13px;padding:30px;text-align:center}
+.empty{color:var(--mt);font-size:13px;padding:30px;text-align:center}
+
+.queue-item{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:12px}
+.queue-item-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.queue-item-title{font-size:15px;font-weight:700}
+.queue-item-meta{font-size:11px;color:var(--mt);margin-top:3px}
+
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.detail-row .k{color:var(--mt)}
+.detail-row .v{color:var(--tx);text-align:right}
+
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.stats-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <h2>🔐 Админка PromptCash</h2>
+    <input type="password" id="admin-secret-input" placeholder="Введите admin secret"/>
+    <button onclick="doAdminLogin()">Войти</button>
+    <div class="gate-err" id="gate-err"></div>
+  </div>
+</div>
+
+<div class="layout" id="app" style="display:none">
+  <div class="sidebar">
+    <div class="sb-logo">💰 Prompt<em>Cash</em> <span style="font-size:11px;color:var(--mt)">admin</span></div>
+    <nav class="sb-nav">
+      <button class="sb-item active" onclick="showPage('overview')"><span>📊 Дашборд</span></button>
+      <button class="sb-item" onclick="showPage('moderation')"><span>🛡 Модерация</span><span class="sb-badge" id="mod-badge" style="display:none">0</span></button>
+      <button class="sb-item" onclick="showPage('campaigns')"><span>📢 Все кампании</span></button>
+      <button class="sb-item" onclick="showPage('advertisers')"><span>🏢 Рекламодатели</span></button>
+      <button class="sb-item" onclick="showPage('users')"><span>👤 Пользователи</span></button>
+      <button class="sb-item" onclick="showPage('payouts')"><span>💸 Выплаты</span></button>
+    </nav>
+  </div>
+
+  <div class="main">
+
+    <!-- ОБЗОР -->
+    <div class="page active" id="page-overview">
+      <div class="ph"><h1>Дашборд</h1><p>Общая картина бизнеса</p></div>
+      <div class="stats-row">
+        <div class="stat-box warn"><div class="val" id="ov-pending-review">—</div><div class="lbl">На модерации</div></div>
+        <div class="stat-box"><div class="val" id="ov-active-campaigns">—</div><div class="lbl">Активных кампаний</div></div>
+        <div class="stat-box"><div class="val" id="ov-advertisers">—</div><div class="lbl">Рекламодателей</div></div>
+        <div class="stat-box"><div class="val" id="ov-users">—</div><div class="lbl">Пользователей</div></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="val" id="ov-revenue">—</div><div class="lbl">Доход от рекламы</div></div>
+        <div class="stat-box"><div class="val" id="ov-pending-payout">—</div><div class="lbl">К выплате юзерам</div></div>
+        <div class="stat-box warn"><div class="val" id="ov-payout-requests">—</div><div class="lbl">Заявок на выплату</div></div>
+        <div class="stat-box danger"><div class="val" id="ov-blocked-users">—</div><div class="lbl">Заблокировано юзеров</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💰 Баланс пользователей по статусам</div>
+        <table class="tbl">
+          <thead><tr><th>Pending</th><th>Approved</th><th>Available</th><th>Paid</th></tr></thead>
+          <tbody><tr>
+            <td id="ov-wallet-pending">—</td>
+            <td id="ov-wallet-approved">—</td>
+            <td id="ov-wallet-available">—</td>
+            <td id="ov-wallet-paid">—</td>
+          </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- МОДЕРАЦИЯ -->
+    <div class="page" id="page-moderation">
+      <div class="ph"><h1>Модерация объявлений</h1><p>Проверьте новые кампании перед запуском</p></div>
+      <div id="moderation-queue"><div class="loading">Загрузка...</div></div>
+    </div>
+
+    <!-- ВСЕ КАМПАНИИ -->
+    <div class="page" id="page-campaigns">
+      <div class="ph"><h1>Все кампании</h1><p>Кампании всех рекламодателей</p></div>
+      <div class="filters">
+        <select id="camp-filter-status" onchange="loadCampaigns()">
+          <option value="">Все статусы</option>
+          <option value="active">Активна</option>
+          <option value="paused">На паузе</option>
+          <option value="pending_review">На модерации</option>
+          <option value="rejected">Отклонена</option>
+        </select>
+        <select id="camp-sort" onchange="loadCampaigns()">
+          <option value="">Сначала новые</option>
+          <option value="clicks">По кликам</option>
+          <option value="spent">По расходам</option>
+        </select>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div id="campaigns-list"><div class="loading">Загрузка...</div></div>
+      </div>
+    </div>
+
+    <!-- РЕКЛАМОДАТЕЛИ -->
+    <div class="page" id="page-advertisers">
+      <div class="ph"><h1>Рекламодатели</h1><p>Все зарегистрированные компании</p></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div id="advertisers-list"><div class="loading">Загрузка...</div></div>
+      </div>
+    </div>
+
+    <!-- ПОЛЬЗОВАТЕЛИ -->
+    <div class="page" id="page-users">
+      <div class="ph"><h1>Пользователи расширения</h1><p>Все юзеры, показы, клики, заработок</p></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div id="users-list"><div class="loading">Загрузка...</div></div>
+      </div>
+    </div>
+
+    <!-- ВЫПЛАТЫ -->
+    <div class="page" id="page-payouts">
+      <div class="ph"><h1>Заявки на выплату</h1><p>Запросы пользователей на вывод средств</p></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div id="payouts-list"><div class="loading">Загрузка...</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: ОТКЛОНИТЬ -->
+<div class="modal-overlay" id="modal-reject">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-reject')">×</button>
+    <h2>Отклонить объявление</h2>
+    <p>Укажите причину — рекламодатель увидит её в своём кабинете.</p>
+    <textarea id="reject-reason" placeholder="Например: заголовок содержит брендинг ChatGPT, что запрещено правилами"></textarea>
+    <button class="btn btn-danger" style="width:100%" onclick="confirmReject()">Отклонить кампанию</button>
+  </div>
+</div>
+
+<!-- MODAL: ПОПОЛНИТЬ БАЛАНС -->
+<div class="modal-overlay" id="modal-topup-adv">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-topup-adv')">×</button>
+    <h2>Пополнить баланс рекламодателя</h2>
+    <p>Используйте после получения оплаты вручную (до подключения ЮKassa).</p>
+    <input type="number" id="topup-amount" placeholder="Сумма в рублях"/>
+    <textarea id="topup-note" placeholder="Комментарий (необязательно)" style="min-height:60px"></textarea>
+    <button class="btn btn-primary" style="width:100%" onclick="confirmTopup()">Пополнить</button>
+  </div>
+</div>
+
+<!-- MODAL: ДЕТАЛИ ЮЗЕРА -->
+<div class="modal-overlay" id="modal-user-detail">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-user-detail')">×</button>
+    <h2 id="ud-title">Пользователь</h2>
+    <div id="ud-content"><div class="loading">Загрузка...</div></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://romptcash-backend.onrender.com';
+let ADMIN_SECRET = sessionStorage.getItem('pc_admin_secret');
+
+if (ADMIN_SECRET) {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  initAdmin();
+}
+
+async function doAdminLogin() {
+  const secret = document.getElementById('admin-secret-input').value;
+  if (!secret) return;
+  try {
+    const res = await fetch(API + '/admin/overview', { headers: { 'x-admin-secret': secret } });
+    if (!res.ok) throw new Error('Неверный пароль');
+    ADMIN_SECRET = secret;
+    sessionStorage.setItem('pc_admin_secret', secret);
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    initAdmin();
+  } catch(e) {
+    document.getElementById('gate-err').textContent = e.message;
+  }
+}
+
+async function adminFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET, ...(opts.headers || {}) }
+  });
+  if (!res.ok) { const e = await res.json().catch(() => ({error:'Ошибка запроса'})); throw new Error(e.error || 'Ошибка'); }
+  return res.json();
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const map = {overview:0, moderation:1, campaigns:2, advertisers:3, users:4, payouts:5};
+  document.querySelectorAll('.sb-item')[map[id]].classList.add('active');
+
+  if (id === 'moderation') loadModerationQueue();
+  if (id === 'campaigns') loadCampaigns();
+  if (id === 'advertisers') loadAdvertisers();
+  if (id === 'users') loadUsers();
+  if (id === 'payouts') loadPayouts();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
+
+async function initAdmin() {
+  try {
+    const ov = await adminFetch('/admin/overview');
+    document.getElementById('ov-pending-review').textContent = ov.moderation.pendingReview;
+    document.getElementById('ov-active-campaigns').textContent = ov.campaigns.active;
+    document.getElementById('ov-advertisers').textContent = ov.advertisers.count;
+    document.getElementById('ov-users').textContent = ov.users.total;
+    document.getElementById('ov-revenue').textContent = ov.advertisers.totalRevenueRub.toLocaleString('ru') + ' ₽';
+    document.getElementById('ov-pending-payout').textContent = '$' + ov.wallets.available.toFixed(2);
+    document.getElementById('ov-payout-requests').textContent = ov.payouts.pendingCount;
+    document.getElementById('ov-blocked-users').textContent = ov.users.blocked;
+    document.getElementById('ov-wallet-pending').textContent = '$' + ov.wallets.pending.toFixed(2);
+    document.getElementById('ov-wallet-approved').textContent = '$' + ov.wallets.approved.toFixed(2);
+    document.getElementById('ov-wallet-available').textContent = '$' + ov.wallets.available.toFixed(2);
+    document.getElementById('ov-wallet-paid').textContent = '$' + ov.wallets.paid.toFixed(2);
+
+    if (ov.moderation.pendingReview > 0) {
+      const badge = document.getElementById('mod-badge');
+      badge.style.display = 'inline-block';
+      badge.textContent = ov.moderation.pendingReview;
+    }
+  } catch(e) { console.error('overview error', e); }
+}
+
+// ===== МОДЕРАЦИЯ =====
+async function loadModerationQueue() {
+  try {
+    const queue = await adminFetch('/admin/moderation/queue');
+    const el = document.getElementById('moderation-queue');
+    if (queue.length === 0) {
+      el.innerHTML = '<div class="empty">✓ Нет кампаний на модерации</div>';
+      return;
+    }
+    el.innerHTML = queue.map(c => {
+      const budgetRub = Math.round(c.total_budget_usd * 75);
+      const preview = c.placement_type === 'image_card' && c.image_url
+        ? `<div class="ad-preview-mini"><img src="${c.image_url}"/><div class="t">${c.title}</div><div class="d">${c.description}</div></div>`
+        : `<div class="ad-preview-mini"><div class="t">${c.title}</div><div class="d">${c.description}</div></div>`;
+      return `<div class="queue-item">
+        <div class="queue-item-head">
+          <div>
+            <div class="queue-item-title">${c.title}</div>
+            <div class="queue-item-meta">${c.advertiser_name} · Бюджет ${budgetRub.toLocaleString('ru')} ₽ · Формат: ${c.placement_type === 'image_card' ? 'Карточка с фото' : 'Текстовый попап'} · ${new Date(c.created_at).toLocaleString('ru')}</div>
+          </div>
+          <span class="badge pending_review">На модерации</span>
+        </div>
+        ${preview}
+        <div class="detail-row"><span class="k">Кнопка</span><span class="v">${c.cta}</span></div>
+        <div class="detail-row"><span class="k">Ссылка</span><span class="v"><a href="${c.url}" target="_blank" style="color:var(--g)">${c.url}</a></span></div>
+        <div class="btn-group" style="margin-top:14px">
+          <button class="btn btn-primary" onclick="approveCampaign('${c.id}')">✓ Одобрить</button>
+          <button class="btn btn-danger" onclick="openRejectModal('${c.id}')">✕ Отклонить</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.error('queue error', e); }
+}
+
+async function approveCampaign(id) {
+  try {
+    await adminFetch('/admin/moderation/' + id + '/approve', { method: 'PATCH' });
+    loadModerationQueue();
+    initAdmin();
+  } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+let rejectingCampaignId = null;
+function openRejectModal(id) {
+  rejectingCampaignId = id;
+  document.getElementById('reject-reason').value = '';
+  openModal('modal-reject');
+}
+async function confirmReject() {
+  const reason = document.getElementById('reject-reason').value;
+  if (!reason) return alert('Укажите причину отклонения');
+  try {
+    await adminFetch('/admin/moderation/' + rejectingCampaignId + '/reject', { method: 'PATCH', body: JSON.stringify({ reason }) });
+    closeModal('modal-reject');
+    loadModerationQueue();
+    initAdmin();
+  } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+// ===== ВСЕ КАМПАНИИ =====
+async function loadCampaigns() {
+  try {
+    const status = document.getElementById('camp-filter-status').value;
+    const sortBy = document.getElementById('camp-sort').value;
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    if (sortBy) params.set('sortBy', sortBy);
+
+    const camps = await adminFetch('/admin/campaigns?' + params.toString());
+    const el = document.getElementById('campaigns-list');
+    if (camps.length === 0) { el.innerHTML = '<div class="empty">Нет кампаний</div>'; return; }
+
+    const rows = camps.map(c => {
+      const statusBadge = `<span class="badge ${c.status}">${
+        {active:'● Активна', paused:'⏸ На паузе', pending_review:'🕐 Модерация', rejected:'✕ Отклонена'}[c.status] || c.status
+      }</span>`;
+      return `<tr>
+        <td><strong>${c.title}</strong></td>
+        <td>${c.advertiser_name}</td>
+        <td>${statusBadge}</td>
+        <td>${c.impressions.toLocaleString('ru')}</td>
+        <td>${c.clicks.toLocaleString('ru')}</td>
+        <td>${c.spentRub.toLocaleString('ru')} ₽</td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `<table class="tbl"><thead><tr><th>Объявление</th><th>Рекламодатель</th><th>Статус</th><th>Показы</th><th>Клики</th><th>Потрачено</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch(e) { console.error('campaigns error', e); }
+}
+
+// ===== РЕКЛАМОДАТЕЛИ =====
+async function loadAdvertisers() {
+  try {
+    const list = await adminFetch('/admin/advertisers');
+    const el = document.getElementById('advertisers-list');
+    if (list.length === 0) { el.innerHTML = '<div class="empty">Нет рекламодателей</div>'; return; }
+
+    const rows = list.map(a => {
+      const statusBadge = a.status === 'blocked' ? '<span class="badge blocked">Заблокирован</span>' : '<span class="badge active">Активен</span>';
+      const blockBtn = a.status === 'blocked'
+        ? `<button class="btn btn-secondary btn-sm" onclick="unblockAdvertiser('${a.id}')">Разблокировать</button>`
+        : `<button class="btn btn-danger btn-sm" onclick="blockAdvertiser('${a.id}')">Заблокировать</button>`;
+      return `<tr>
+        <td><strong>${a.company_name || a.name}</strong><div style="font-size:11px;color:var(--mt)">${a.email}</div></td>
+        <td>${a.industry || '—'}</td>
+        <td>${statusBadge}</td>
+        <td>${a.campaignsCount}</td>
+        <td>${(a.balance_rub||0).toLocaleString('ru')} ₽</td>
+        <td>${(a.total_spent_rub||0).toLocaleString('ru')} ₽</td>
+        <td><div class="btn-group">
+          <button class="btn btn-secondary btn-sm" onclick="openTopupModal('${a.id}')">+ Баланс</button>
+          ${blockBtn}
+        </div></td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `<table class="tbl"><thead><tr><th>Компания</th><th>Сфера</th><th>Статус</th><th>Кампаний</th><th>Баланс</th><th>Потрачено всего</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch(e) { console.error('advertisers error', e); }
+}
+
+async function blockAdvertiser(id) {
+  if (!confirm('Заблокировать рекламодателя?')) return;
+  try { await adminFetch('/admin/advertisers/' + id + '/block', { method: 'PATCH' }); loadAdvertisers(); }
+  catch(e) { alert('Ошибка: ' + e.message); }
+}
+async function unblockAdvertiser(id) {
+  try { await adminFetch('/admin/advertisers/' + id + '/unblock', { method: 'PATCH' }); loadAdvertisers(); }
+  catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+let topupAdvertiserId = null;
+function openTopupModal(id) {
+  topupAdvertiserId = id;
+  document.getElementById('topup-amount').value = '';
+  document.getElementById('topup-note').value = '';
+  openModal('modal-topup-adv');
+}
+async function confirmTopup() {
+  const amountRub = parseFloat(document.getElementById('topup-amount').value);
+  const note = document.getElementById('topup-note').value;
+  if (!amountRub || amountRub <= 0) return alert('Введите сумму');
+  try {
+    await adminFetch('/admin/advertisers/' + topupAdvertiserId + '/topup', { method: 'POST', body: JSON.stringify({ amountRub, note }) });
+    closeModal('modal-topup-adv');
+    loadAdvertisers();
+  } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+// ===== ПОЛЬЗОВАТЕЛИ =====
+async function loadUsers() {
+  try {
+    const list = await adminFetch('/admin/users');
+    const el = document.getElementById('users-list');
+    if (list.length === 0) { el.innerHTML = '<div class="empty">Нет пользователей</div>'; return; }
+
+    const rows = list.map(u => {
+      const statusBadge = u.status === 'blocked' ? '<span class="badge blocked">Заблокирован</span>' : '<span class="badge active">Активен</span>';
+      const w = u.wallet;
+      return `<tr>
+        <td><a class="badge" style="cursor:pointer;background:var(--bg3);color:var(--tx)" onclick="openUserDetail('${u.id}')">${u.id.slice(0,8)}...</a></td>
+        <td>${statusBadge}</td>
+        <td>${u.impressions.toLocaleString('ru')}</td>
+        <td>${u.clicks.toLocaleString('ru')}</td>
+        <td>$${(w.pending_usd||0).toFixed(2)}</td>
+        <td>$${(w.available_usd||0).toFixed(2)}</td>
+        <td>$${(w.paid_usd||0).toFixed(2)}</td>
+        <td>${new Date(u.created_at).toLocaleDateString('ru')}</td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `<table class="tbl"><thead><tr><th>ID</th><th>Статус</th><th>Показы</th><th>Клики</th><th>Pending</th><th>Available</th><th>Paid</th><th>Регистрация</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch(e) { console.error('users error', e); }
+}
+
+async function openUserDetail(id) {
+  openModal('modal-user-detail');
+  document.getElementById('ud-content').innerHTML = '<div class="loading">Загрузка...</div>';
+  try {
+    const data = await adminFetch('/admin/users/' + id);
+    const u = data.user;
+    const w = data.wallet || { pending_usd:0, approved_usd:0, available_usd:0, paid_usd:0 };
+    document.getElementById('ud-title').textContent = 'Пользователь ' + id.slice(0,8) + '...';
+    document.getElementById('ud-content').innerHTML = `
+      <div class="detail-row"><span class="k">Статус</span><span class="v">${u.status === 'blocked' ? '<span class="badge blocked">Заблокирован</span>' : '<span class="badge active">Активен</span>'}</span></div>
+      <div class="detail-row"><span class="k">Зарегистрирован</span><span class="v">${new Date(u.created_at).toLocaleString('ru')}</span></div>
+      <div class="detail-row"><span class="k">Последняя активность</span><span class="v">${new Date(u.last_seen_at).toLocaleString('ru')}</span></div>
+      <div class="detail-row"><span class="k">Pending</span><span class="v">$${w.pending_usd.toFixed(4)}</span></div>
+      <div class="detail-row"><span class="k">Approved</span><span class="v">$${w.approved_usd.toFixed(4)}</span></div>
+      <div class="detail-row"><span class="k">Available</span><span class="v">$${w.available_usd.toFixed(4)}</span></div>
+      <div class="detail-row"><span class="k">Paid</span><span class="v">$${w.paid_usd.toFixed(4)}</span></div>
+      <div class="detail-row"><span class="k">Всего показов</span><span class="v">${data.impressions.length}</span></div>
+      <div class="detail-row"><span class="k">Всего кликов</span><span class="v">${data.clicks.length}</span></div>
+      <div class="btn-group" style="margin-top:16px">
+        ${u.status === 'blocked'
+          ? `<button class="btn btn-secondary" onclick="unblockUser('${u.id}')">Разблокировать</button>`
+          : `<button class="btn btn-danger" onclick="blockUser('${u.id}')">Заблокировать</button>`}
+      </div>
+    `;
+  } catch(e) {
+    document.getElementById('ud-content').innerHTML = '<div class="empty">Ошибка: ' + e.message + '</div>';
+  }
+}
+async function blockUser(id) {
+  if (!confirm('Заблокировать пользователя?')) return;
+  try { await adminFetch('/admin/users/' + id + '/block', { method: 'PATCH' }); closeModal('modal-user-detail'); loadUsers(); }
+  catch(e) { alert('Ошибка: ' + e.message); }
+}
+async function unblockUser(id) {
+  try { await adminFetch('/admin/users/' + id + '/unblock', { method: 'PATCH' }); closeModal('modal-user-detail'); loadUsers(); }
+  catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+// ===== ВЫПЛАТЫ =====
+async function loadPayouts() {
+  try {
+    const list = await adminFetch('/admin/payout-requests');
+    const el = document.getElementById('payouts-list');
+    if (list.length === 0) { el.innerHTML = '<div class="empty">Нет заявок</div>'; return; }
+
+    const rows = list.map(p => {
+      const statusMap = { requested: 'pending_review', processing: 'paused', paid: 'active', rejected: 'rejected' };
+      const statusLabel = { requested: 'Запрошена', processing: 'В обработке', paid: 'Выплачена', rejected: 'Отклонена' };
+      const actions = p.status === 'requested'
+        ? `<div class="btn-group">
+            <button class="btn btn-primary btn-sm" onclick="updatePayout('${p.id}','paid')">Выплачено</button>
+            <button class="btn btn-danger btn-sm" onclick="updatePayout('${p.id}','rejected')">Отклонить</button>
+           </div>`
+        : '—';
+      return `<tr>
+        <td>${p.payout_email}</td>
+        <td>$${p.amount_usd.toFixed(2)}</td>
+        <td><span class="badge ${statusMap[p.status]}">${statusLabel[p.status]}</span></td>
+        <td>${new Date(p.requested_at).toLocaleString('ru')}</td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `<table class="tbl"><thead><tr><th>Email</th><th>Сумма</th><th>Статус</th><th>Дата заявки</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch(e) { console.error('payouts error', e); }
+}
+
+async function updatePayout(id, status) {
+  try {
+    await adminFetch('/admin/payout-requests/' + id, { method: 'PATCH', body: JSON.stringify({ status }) });
+    loadPayouts();
+  } catch(e) { alert('Ошибка: ' + e.message); }
+}
+</script>
+</body>
+</html>
