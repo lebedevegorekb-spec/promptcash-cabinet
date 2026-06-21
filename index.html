@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8"/>
@@ -208,6 +208,32 @@ select.form-input{cursor:pointer}
                 <span style="color:var(--mt);font-size:13px" id="budget-shows">— показов</span>
               </div>
               <div class="form-hint">1 показ = 1 ₽. Это лимит — реальное списание идёт за каждый показ с вашего общего баланса.</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Формат объявления</div>
+            <div class="form-group">
+              <div class="form-label">Выберите формат</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <label style="border:2px solid var(--g);border-radius:10px;padding:14px;cursor:pointer;display:block" id="fmt-text-label">
+                  <input type="radio" name="placementType" value="text_banner" checked onchange="updFormat()" style="margin-right:8px"/>
+                  <strong>Текстовый попап</strong>
+                  <div style="font-size:11px;color:var(--mt);margin-top:6px">Полоса сверху страницы, без изображения</div>
+                </label>
+                <label style="border:2px solid var(--bd2);border-radius:10px;padding:14px;cursor:pointer;display:block" id="fmt-image-label">
+                  <input type="radio" name="placementType" value="image_card" onchange="updFormat()" style="margin-right:8px"/>
+                  <strong>Карточка с фото</strong>
+                  <div style="font-size:11px;color:var(--mt);margin-top:6px">Боковая карточка, изображение 280×140px</div>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" id="image-upload-block" style="display:none">
+              <div class="form-label">Изображение (280×140px)</div>
+              <input type="file" id="f-image" accept="image/png,image/jpeg,image/webp" onchange="handleImageUpload(event)" class="form-input"/>
+              <div class="form-hint" id="image-hint">PNG, JPEG или WebP. Точный размер 280×140px.</div>
+              <div id="image-preview-wrap" style="display:none;margin-top:10px">
+                <img id="image-preview" style="width:280px;height:140px;border-radius:8px;border:1px solid var(--bd2);object-fit:cover"/>
+              </div>
             </div>
           </div>
 
@@ -596,6 +622,48 @@ function updPreview() {
   document.getElementById('prev-cta').textContent = c || 'Узнать больше';
 }
 
+let uploadedImageUrl = null;
+
+function updFormat() {
+  const isImage = document.querySelector('input[name="placementType"]:checked').value === 'image_card';
+  document.getElementById('image-upload-block').style.display = isImage ? 'block' : 'none';
+  document.getElementById('fmt-text-label').style.borderColor = isImage ? 'var(--bd2)' : 'var(--g)';
+  document.getElementById('fmt-image-label').style.borderColor = isImage ? 'var(--g)' : 'var(--bd2)';
+}
+
+async function handleImageUpload(e) {
+  const file = e.target.files[0];
+  const hint = document.getElementById('image-hint');
+  if (!file) return;
+
+  hint.textContent = 'Проверяем размер...';
+  hint.className = 'form-hint';
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const res = await fetch(API + '/advertiser/upload-image', {
+      method: 'POST',
+      headers: { 'x-api-key': API_KEY },
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    uploadedImageUrl = data.imageUrl;
+    hint.textContent = '✓ Изображение загружено (' + data.width + '×' + data.height + 'px)';
+    hint.style.color = 'var(--g)';
+    document.getElementById('image-preview').src = data.imageUrl;
+    document.getElementById('image-preview-wrap').style.display = 'block';
+  } catch(err) {
+    uploadedImageUrl = null;
+    hint.textContent = '⚠️ ' + err.message;
+    hint.className = 'form-hint error';
+    document.getElementById('image-preview-wrap').style.display = 'none';
+  }
+}
+
 async function submitCampaign() {
   const name = document.getElementById('f-name').value;
   const title = document.getElementById('f-title').value;
@@ -610,13 +678,19 @@ async function submitCampaign() {
   if (!desc) return alertEl.innerHTML = '<div class="alert warn">Заполните описание</div>';
   if (!url || !url.startsWith('https://')) return alertEl.innerHTML = '<div class="alert warn">Введите корректный URL (https://)</div>';
   if (!budget || budget < 1000) return alertEl.innerHTML = '<div class="alert warn">Минимальный бюджет — 1 000 ₽</div>';
+  const placementType = document.querySelector('input[name="placementType"]:checked').value;
+  if (placementType === 'image_card' && !uploadedImageUrl) return alertEl.innerHTML = '<div class="alert warn">Загрузите изображение 280×140px для этого формата</div>';
 
   const btn = document.getElementById('submit-btn');
   btn.textContent = 'Создаём...'; btn.disabled = true;
   try {
-    await apiFetch('/advertiser/campaigns', { method: 'POST', body: JSON.stringify({ campaignName: name, title, description: desc, cta, url, budgetRub: budget }) });
+    await apiFetch('/advertiser/campaigns', { method: 'POST', body: JSON.stringify({ campaignName: name, title, description: desc, cta, url, budgetRub: budget, placementType, imageUrl: uploadedImageUrl }) });
     btn.textContent = '🚀 Создать кампанию'; btn.disabled = false;
     ['f-name','f-title','f-desc','f-cta','f-url','f-budget'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    uploadedImageUrl = null;
+    document.querySelector('input[name="placementType"][value="text_banner"]').checked = true;
+    updFormat();
+    document.getElementById('image-preview-wrap').style.display = 'none';
     updPreview();
     openModal('modal-success');
     const me = await apiFetch('/advertiser/me');
@@ -685,3 +759,7 @@ function buildChart() {
 </script>
 </body>
 </html>
+
+
+
+
