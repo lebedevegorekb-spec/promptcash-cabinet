@@ -271,12 +271,24 @@ select.form-input{cursor:pointer}
 
         <div class="preview-wrap">
           <div style="font-size:12px;font-weight:600;color:var(--mt);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Превью карточки</div>
-          <div class="preview-card">
+          <div class="preview-card" id="preview-image-card">
+            <img id="prev-img" style="width:100%;height:140px;object-fit:cover;border-radius:8px 8px 0 0;margin:-16px -16px 12px;display:block;background:#f3f4f6"/>
             <div class="preview-lbl">Реклама · Не является частью ответа ChatGPT</div>
             <div class="preview-title" id="prev-title"><span class="preview-placeholder">Заголовок появится здесь</span></div>
             <div class="preview-desc" id="prev-desc"><span class="preview-placeholder">Описание появится здесь</span></div>
             <button class="preview-cta" id="prev-cta">Узнать больше</button>
             <div class="preview-foot"><span>Почему я вижу это?</span><span>×</span></div>
+          </div>
+          <div class="preview-card" id="preview-text-banner" style="display:none;max-width:100%;padding:10px 14px">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span style="font-size:10px;color:#888;background:#f3f4f6;padding:2px 8px;border-radius:20px;flex-shrink:0">Реклама</span>
+              <span id="prev-title-bar" style="font-weight:600;font-size:13px"><span class="preview-placeholder">Заголовок</span></span>
+              <span id="prev-desc-bar" style="color:#777;font-size:12px"><span class="preview-placeholder">Описание</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+              <span style="font-size:11px;color:#999;text-decoration:underline">Почему я вижу это?</span>
+              <span id="prev-cta-bar" style="background:#10a37f;color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px">Узнать больше</span>
+            </div>
           </div>
         </div>
       </div>
@@ -488,6 +500,7 @@ async function init() {
   loadCampaigns();
   loadTransactions();
   buildChart();
+updFormat();
 }
 
 async function loadIndustries(current) {
@@ -620,6 +633,11 @@ function updPreview() {
   document.getElementById('prev-title').innerHTML = t || '<span class="preview-placeholder">Заголовок появится здесь</span>';
   document.getElementById('prev-desc').innerHTML = d || '<span class="preview-placeholder">Описание появится здесь</span>';
   document.getElementById('prev-cta').textContent = c || 'Узнать больше';
+  document.getElementById('prev-title-bar').innerHTML = t || '<span class="preview-placeholder">Заголовок</span>';
+  document.getElementById('prev-desc-bar').innerHTML = d || '<span class="preview-placeholder">Описание</span>';
+  document.getElementById('prev-cta-bar').textContent = c || 'Узнать больше';
+  if (uploadedImageUrl) document.getElementById('prev-img').src = uploadedImageUrl;
+}
 }
 
 let uploadedImageUrl = null;
@@ -629,6 +647,8 @@ function updFormat() {
   document.getElementById('image-upload-block').style.display = isImage ? 'block' : 'none';
   document.getElementById('fmt-text-label').style.borderColor = isImage ? 'var(--bd2)' : 'var(--g)';
   document.getElementById('fmt-image-label').style.borderColor = isImage ? 'var(--g)' : 'var(--bd2)';
+  document.getElementById('preview-image-card').style.display = isImage ? 'block' : 'none';
+  document.getElementById('preview-text-banner').style.display = isImage ? 'none' : 'block';
 }
 
 async function handleImageUpload(e) {
@@ -759,6 +779,8 @@ function buildChart() {
 </script>
 </body>
 </html>
+
+
 
 
 
