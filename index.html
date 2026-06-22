@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8"/>
@@ -12,7 +12,7 @@
   --bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;
   --bd:#252525;--bd2:#333;
   --tx:#f0f0f0;--mt:#777;--mt2:#444;
-  --red:#e55;--yellow:#f5a623;
+  --red:#e55;--yellow:#f5a623;--blue:#5b9eff;
 }
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.6;min-height:100vh}
 .layout{display:flex;min-height:100vh}
@@ -49,11 +49,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-si
 .tbl td{padding:12px 14px;border-bottom:1px solid var(--bd);font-size:13px;vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr:hover td{background:var(--bg3)}
-.tbl .clickable{cursor:pointer;color:var(--tx);text-decoration:none}
-.tbl .clickable:hover{color:var(--g);text-decoration:underline}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
 .badge.active{background:rgba(16,163,127,.15);color:var(--g)}
 .badge.paused{background:rgba(245,166,35,.12);color:var(--yellow)}
+.badge.pending_review{background:rgba(91,158,255,.12);color:var(--blue)}
+.badge.rejected{background:rgba(230,85,85,.12);color:var(--red)}
+.clickable{cursor:pointer;color:var(--tx);text-decoration:none}
+.clickable:hover{color:var(--g);text-decoration:underline}
 .form-group{margin-bottom:20px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .form-label{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;color:var(--mt);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
@@ -84,7 +86,7 @@ select.form-input{cursor:pointer}
 .progress-bar{height:100%;background:var(--g);border-radius:4px}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:480px;width:100%;position:relative;max-height:90vh;overflow-y:auto}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:480px;width:100%;position:relative}
 .modal.wide{max-width:600px}
 .modal h2{font-size:18px;font-weight:800;margin-bottom:8px}
 .modal p{color:var(--mt);font-size:13px;margin-bottom:24px;line-height:1.6}
@@ -210,8 +212,9 @@ select.form-input{cursor:pointer}
               <div class="form-hint">1 показ = 1 ₽. Это лимит — реальное списание идёт за каждый показ с вашего общего баланса.</div>
             </div>
           </div>
+
           <div class="card">
-            <div class="card-title">Формат объявления</div>
+            <div class="card-title">📋 Формат объявления</div>
             <div class="form-group">
               <div class="form-label">Выберите формат</div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -372,9 +375,13 @@ select.form-input{cursor:pointer}
             <tr><td><strong>Описание</strong></td><td>Макс. 120 символов</td></tr>
             <tr><td><strong>Кнопка CTA</strong></td><td>Макс. 20 символов</td></tr>
             <tr><td><strong>URL</strong></td><td>Только https://</td></tr>
-            <tr><td><strong>Изображения</strong></td><td>Не поддерживаются</td></tr>
+            <tr><td><strong>Изображение</strong></td><td>Точно 280×140px (PNG/JPEG/WebP)</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="card">
+        <div class="card-title">🛡 Как работает модерация</div>
+        <p style="color:var(--mt);font-size:13px;line-height:1.7">Каждая новая кампания проходит проверку перед запуском — обычно до 2 часов. Если объявление отклонено, вы увидите причину в деталях кампании.</p>
       </div>
       <div class="card">
         <div class="card-title">📞 Связаться с нами</div>
@@ -408,7 +415,7 @@ select.form-input{cursor:pointer}
   <div class="modal" style="text-align:center">
     <div style="font-size:48px;margin-bottom:16px">🎉</div>
     <h2>Кампания создана!</h2>
-    <p>Объявление активно и уже показывается пользователям PromptCash.</p>
+    <p>Объявление отправлено на модерацию. Обычно проверка занимает до 2 часов. Как только мы одобрим кампанию — показы начнутся автоматически.</p>
     <button class="btn btn-primary" style="width:100%" onclick="closeModal('modal-success');showPage('campaigns');loadCampaigns()">Перейти к кампаниям</button>
   </div>
 </div>
@@ -419,9 +426,8 @@ select.form-input{cursor:pointer}
     <button class="modal-close" onclick="closeModal('modal-campaign-detail')">×</button>
     <h2 id="detail-title">—</h2>
     <p id="detail-status"></p>
-
+    <div id="detail-rejection-reason" style="display:none;background:rgba(230,85,85,.1);border:1px solid rgba(230,85,85,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:#e55;margin-bottom:20px;line-height:1.5"></div>
     <div id="detail-preview-wrap" style="margin-bottom:20px"></div>
-
     <div class="detail-stats">
       <div class="detail-stat"><div class="v" id="detail-impressions">—</div><div class="l">Показов</div></div>
       <div class="detail-stat"><div class="v" id="detail-clicks">—</div><div class="l">Кликов</div></div>
@@ -430,20 +436,17 @@ select.form-input{cursor:pointer}
       <div class="detail-stat"><div class="v" id="detail-spent">—</div><div class="l">Потрачено</div></div>
       <div class="detail-stat"><div class="v" id="detail-budget-stat">—</div><div class="l">Бюджет</div></div>
     </div>
-
     <div style="margin-bottom:20px">
       <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mt);margin-bottom:6px">
         <span>Использовано бюджета кампании</span>
       </div>
       <div class="progress-wrap"><div class="progress-bar" id="detail-progress" style="width:0%"></div></div>
     </div>
-
     <div style="background:var(--bg3);border-radius:10px;padding:16px;margin-bottom:20px">
       <div class="detail-row"><span class="k">Описание</span><span class="v" id="detail-desc">—</span></div>
       <div class="detail-row"><span class="k">Текст кнопки</span><span class="v" id="detail-cta">—</span></div>
       <div class="detail-row"><span class="k">Ссылка</span><a class="v" id="detail-url" href="#" target="_blank" style="color:var(--g)">—</a></div>
     </div>
-
     <button class="btn btn-secondary" id="detail-pause-btn" style="width:100%">⏸ Поставить на паузу</button>
   </div>
 </div>
@@ -452,6 +455,7 @@ select.form-input{cursor:pointer}
 const API = 'https://romptcash-backend.onrender.com';
 let API_KEY = localStorage.getItem('pc_api_key');
 let ADVERTISER = JSON.parse(localStorage.getItem('pc_advertiser') || 'null');
+let uploadedImageUrl = null;
 
 if (!API_KEY) {
   document.getElementById('gate').style.display = 'flex';
@@ -502,7 +506,7 @@ async function init() {
   loadCampaigns();
   loadTransactions();
   buildChart();
-updFormat();
+  updFormat();
 }
 
 async function loadIndustries(current) {
@@ -518,6 +522,13 @@ function updateBalance(bal) {
   document.getElementById('sb-bal').textContent = bal.toLocaleString('ru') + ' ₽';
   document.getElementById('sb-shows').textContent = '≈ ' + bal.toLocaleString('ru') + ' показов осталось';
 }
+
+const STATUS_LABELS = {
+  active: '<span class="badge active">● Активна</span>',
+  paused: '<span class="badge paused">⏸ На паузе</span>',
+  pending_review: '<span class="badge pending_review">🕐 На модерации</span>',
+  rejected: '<span class="badge rejected">✕ Отклонена</span>'
+};
 
 async function loadCampaigns() {
   try {
@@ -540,12 +551,18 @@ function renderCampaignsTable(camps) {
     const pct = Math.round((c.spent_usd / c.total_budget_usd) * 100);
     const budgetRub = Math.round(c.total_budget_usd * 75);
     const spentRub = Math.round(c.spent_usd * 75);
-    const statusBadge = c.status === 'active' ? '<span class="badge active">● Активна</span>' : '<span class="badge paused">⏸ На паузе</span>';
-    const pauseBtn = c.status === 'active'
-      ? `<button class="btn btn-secondary btn-sm" onclick="toggleCamp('${c.id}','paused')">⏸</button>`
-      : `<button class="btn btn-secondary btn-sm" onclick="toggleCamp('${c.id}','active')">▶️</button>`;
+    const statusBadge = STATUS_LABELS[c.status] || c.status;
+
+    let pauseBtn = '';
+    if (c.status === 'active') pauseBtn = `<button class="btn btn-secondary btn-sm" onclick="toggleCamp('${c.id}','paused')">⏸</button>`;
+    if (c.status === 'paused') pauseBtn = `<button class="btn btn-secondary btn-sm" onclick="toggleCamp('${c.id}','active')">▶️</button>`;
+
+    const thumb = c.placement_type === 'image_card' && c.image_url
+      ? `<img src="${c.image_url}" style="width:40px;height:20px;border-radius:4px;object-fit:cover;flex-shrink:0"/>`
+      : '';
+
     return `<tr>
-      <td><div style="display:flex;align-items:center;gap:10px">${c.placement_type === 'image_card' && c.image_url ? '<img src="' + c.image_url + '" style="width:40px;height:20px;border-radius:4px;object-fit:cover;flex-shrink:0"/>' : ''}<a class="clickable" onclick="openCampaignDetail('${c.id}')" style="font-weight:600">${c.title}</a></div></td>
+      <td><div style="display:flex;align-items:center;gap:10px">${thumb}<a class="clickable" onclick="openCampaignDetail('${c.id}')" style="font-weight:600">${c.title}</a></div></td>
       <td>${statusBadge}</td>
       <td>${(c.impressions ?? 0).toLocaleString('ru')}</td>
       <td>${(c.clicks ?? 0).toLocaleString('ru')}</td>
@@ -563,9 +580,15 @@ async function openCampaignDetail(id) {
     const st = data.stats;
 
     document.getElementById('detail-title').textContent = c.title;
-    document.getElementById('detail-status').innerHTML = c.status === 'active'
-      ? '<span class="badge active">● Активна</span>'
-      : '<span class="badge paused">⏸ На паузе</span>';
+    document.getElementById('detail-status').innerHTML = STATUS_LABELS[c.status] || c.status;
+
+    const rejectionEl = document.getElementById('detail-rejection-reason');
+    if (c.status === 'rejected' && c.rejection_reason) {
+      rejectionEl.style.display = 'block';
+      rejectionEl.innerHTML = '<strong>Причина отклонения:</strong> ' + c.rejection_reason;
+    } else {
+      rejectionEl.style.display = 'none';
+    }
 
     const previewEl = document.getElementById('detail-preview-wrap');
     if (c.placement_type === 'image_card' && c.image_url) {
@@ -573,6 +596,7 @@ async function openCampaignDetail(id) {
     } else {
       previewEl.innerHTML = '<div style="font-size:11px;color:var(--mt);margin-bottom:8px">Превью объявления</div><div style="background:#fff;border-radius:10px;padding:10px 14px;font-family:-apple-system,sans-serif;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:10px;color:#888;background:#f3f4f6;padding:2px 8px;border-radius:20px">Реклама</span><span style="font-weight:600;font-size:13px;color:#111">' + c.title + '</span><span style="color:#777;font-size:12px">' + c.description + '</span><span style="background:#10a37f;color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;margin-left:auto">' + c.cta + '</span></div>';
     }
+
     document.getElementById('detail-impressions').textContent = st.impressions.toLocaleString('ru');
     document.getElementById('detail-clicks').textContent = st.clicks.toLocaleString('ru');
     document.getElementById('detail-ctr').textContent = st.ctr + '%';
@@ -588,11 +612,16 @@ async function openCampaignDetail(id) {
     document.getElementById('detail-progress').style.width = pct + '%';
 
     const btn = document.getElementById('detail-pause-btn');
-    btn.textContent = c.status === 'active' ? '⏸ Поставить на паузу' : '▶️ Возобновить';
-    btn.onclick = async () => {
-      await toggleCamp(c.id, c.status === 'active' ? 'paused' : 'active');
-      openCampaignDetail(c.id);
-    };
+    if (c.status === 'active' || c.status === 'paused') {
+      btn.style.display = 'block';
+      btn.textContent = c.status === 'active' ? '⏸ Поставить на паузу' : '▶️ Возобновить';
+      btn.onclick = async () => {
+        await toggleCamp(c.id, c.status === 'active' ? 'paused' : 'active');
+        openCampaignDetail(c.id);
+      };
+    } else {
+      btn.style.display = 'none';
+    }
 
     openModal('modal-campaign-detail');
   } catch(e) {
@@ -637,18 +666,6 @@ function valUrl(input) {
     hint.textContent = '⚠️ URL должен начинаться с https://'; hint.className = 'form-hint error'; input.style.borderColor = 'var(--red)';
   } else { hint.textContent = 'Только https://'; hint.className = 'form-hint'; input.style.borderColor = ''; }
 }
-function updPreview() {
-  const t = document.getElementById('f-title').value, d = document.getElementById('f-desc').value, c = document.getElementById('f-cta').value;
-  document.getElementById('prev-title').innerHTML = t || '<span class="preview-placeholder">Заголовок появится здесь</span>';
-  document.getElementById('prev-desc').innerHTML = d || '<span class="preview-placeholder">Описание появится здесь</span>';
-  document.getElementById('prev-cta').textContent = c || 'Узнать больше';
-  document.getElementById('prev-title-bar').innerHTML = t || '<span class="preview-placeholder">Заголовок</span>';
-  document.getElementById('prev-desc-bar').innerHTML = d || '<span class="preview-placeholder">Описание</span>';
-  document.getElementById('prev-cta-bar').textContent = c || 'Узнать больше';
-  if (uploadedImageUrl) document.getElementById('prev-img').src = uploadedImageUrl;
-}
-
-let uploadedImageUrl = null;
 
 function updFormat() {
   const isImage = document.querySelector('input[name="placementType"]:checked').value === 'image_card';
@@ -684,12 +701,24 @@ async function handleImageUpload(e) {
     hint.style.color = 'var(--g)';
     document.getElementById('image-preview').src = data.imageUrl;
     document.getElementById('image-preview-wrap').style.display = 'block';
+    updPreview();
   } catch(err) {
     uploadedImageUrl = null;
     hint.textContent = '⚠️ ' + err.message;
     hint.className = 'form-hint error';
     document.getElementById('image-preview-wrap').style.display = 'none';
   }
+}
+
+function updPreview() {
+  const t = document.getElementById('f-title').value, d = document.getElementById('f-desc').value, c = document.getElementById('f-cta').value;
+  document.getElementById('prev-title').innerHTML = t || '<span class="preview-placeholder">Заголовок появится здесь</span>';
+  document.getElementById('prev-desc').innerHTML = d || '<span class="preview-placeholder">Описание появится здесь</span>';
+  document.getElementById('prev-cta').textContent = c || 'Узнать больше';
+  document.getElementById('prev-title-bar').innerHTML = t || '<span class="preview-placeholder">Заголовок</span>';
+  document.getElementById('prev-desc-bar').innerHTML = d || '<span class="preview-placeholder">Описание</span>';
+  document.getElementById('prev-cta-bar').textContent = c || 'Узнать больше';
+  if (uploadedImageUrl) document.getElementById('prev-img').src = uploadedImageUrl;
 }
 
 async function submitCampaign() {
@@ -699,6 +728,7 @@ async function submitCampaign() {
   const cta = document.getElementById('f-cta').value || 'Узнать больше';
   const url = document.getElementById('f-url').value;
   const budget = parseInt(document.getElementById('f-budget').value);
+  const placementType = document.querySelector('input[name="placementType"]:checked').value;
   const alertEl = document.getElementById('form-alert');
   alertEl.innerHTML = '';
 
@@ -706,7 +736,6 @@ async function submitCampaign() {
   if (!desc) return alertEl.innerHTML = '<div class="alert warn">Заполните описание</div>';
   if (!url || !url.startsWith('https://')) return alertEl.innerHTML = '<div class="alert warn">Введите корректный URL (https://)</div>';
   if (!budget || budget < 1000) return alertEl.innerHTML = '<div class="alert warn">Минимальный бюджет — 1 000 ₽</div>';
-  const placementType = document.querySelector('input[name="placementType"]:checked').value;
   if (placementType === 'image_card' && !uploadedImageUrl) return alertEl.innerHTML = '<div class="alert warn">Загрузите изображение 280×140px для этого формата</div>';
 
   const btn = document.getElementById('submit-btn');
@@ -787,14 +816,3 @@ function buildChart() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
