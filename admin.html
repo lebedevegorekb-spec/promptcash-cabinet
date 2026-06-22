@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8"/>
@@ -395,18 +395,41 @@ async function loadCampaigns() {
       const statusBadge = `<span class="badge ${c.status}">${
         {active:'● Активна', paused:'⏸ На паузе', pending_review:'🕐 Модерация', rejected:'✕ Отклонена'}[c.status] || c.status
       }</span>`;
+      let actionBtn = '';
+      if (c.status === 'active') {
+        actionBtn = `<button class="btn btn-secondary btn-sm" onclick="pauseCampaign('${c.id}')">⏸ Пауза</button>`;
+      } else if (c.status === 'paused') {
+        actionBtn = `<button class="btn btn-primary btn-sm" onclick="activateCampaign('${c.id}')">▶ Активировать</button>`;
+      }
       return `<tr>
         <td><strong>${c.title}</strong></td>
-        <td>${c.advertiser_name}</td>
+        <td>${c.advertiser_name || '—'}</td>
         <td>${statusBadge}</td>
         <td>${c.impressions.toLocaleString('ru')}</td>
         <td>${c.clicks.toLocaleString('ru')}</td>
         <td>${c.spentRub.toLocaleString('ru')} ₽</td>
+        <td>${actionBtn}</td>
       </tr>`;
     }).join('');
 
-    el.innerHTML = `<table class="tbl"><thead><tr><th>Объявление</th><th>Рекламодатель</th><th>Статус</th><th>Показы</th><th>Клики</th><th>Потрачено</th></tr></thead><tbody>${rows}</tbody></table>`;
+    el.innerHTML = `<table class="tbl"><thead><tr><th>Объявление</th><th>Рекламодатель</th><th>Статус</th><th>Показы</th><th>Клики</th><th>Потрачено</th><th>Действия</th></tr></thead><tbody>${rows}</tbody></table>`;
   } catch(e) { console.error('campaigns error', e); }
+}
+
+async function pauseCampaign(id) {
+  if (!confirm('Поставить кампанию на паузу?')) return;
+  try {
+    await adminFetch('/admin/campaigns/' + id, { method: 'PATCH', body: JSON.stringify({ status: 'paused' }) });
+    loadCampaigns();
+  } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+async function activateCampaign(id) {
+  if (!confirm('Активировать кампанию?')) return;
+  try {
+    await adminFetch('/admin/campaigns/' + id, { method: 'PATCH', body: JSON.stringify({ status: 'active' }) });
+    loadCampaigns();
+  } catch(e) { alert('Ошибка: ' + e.message); }
 }
 
 // ===== РЕКЛАМОДАТЕЛИ =====
