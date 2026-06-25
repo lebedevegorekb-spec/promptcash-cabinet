@@ -646,9 +646,8 @@ async function loadTransactions() {
       const desc = isPlus ? ('Пополнение баланса' + statusBadge) : 'Списание за показы';
       return `<tr><td style="color:var(--mt)">${date}</td><td>${desc}</td><td style="color:${color};font-weight:600">${sign}${Math.abs(t.amount_rub).toLocaleString('ru')} ₽</td><td>${(t.balance_after||0).toLocaleString('ru')} ₽</td></tr>`;
     }).join('');
-    el.innerHTML = `<table class="tbl"><thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th><th>Баланс после</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
   } catch(e) { console.error('transactions error', e); }
+}
 function cnt(input, id, max) {
   const l = input.value.length;
   const el = document.getElementById(id);
