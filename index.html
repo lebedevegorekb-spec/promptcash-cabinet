@@ -800,7 +800,7 @@ function selTopup(el, amt) {
   document.querySelectorAll('.topup-opt').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected'); selAmt = amt;
   const cd = document.getElementById('custom-topup');
-  if (cd) cd.style.display = amt === 0 ? 'block' : 'none';
+}
 function doTopup() {
   if (selAmt === 0) {
     const customVal = parseInt(document.getElementById('custom-amt')?.value) || 0;
@@ -827,7 +827,6 @@ function doTopup() {
     }
   })
   .catch(e => { console.error(e); alert('Ошибка соединения с сервером'); });
-}
 }
 function buildChart() {
   const chart = document.getElementById('chart');
