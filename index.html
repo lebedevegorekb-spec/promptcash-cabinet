@@ -633,6 +633,7 @@ async function toggleCamp(id, status) {
 }
 
 async function loadTransactions() {
+async function loadTransactions() {
   try {
     const txs = await apiFetch('/advertiser/transactions');
     const el = document.getElementById('transactions-list');
@@ -642,17 +643,12 @@ async function loadTransactions() {
       const color = isPlus ? 'var(--g)' : 'var(--red)';
       const sign = isPlus ? '+' : '';
       const date = new Date(t.created_at).toLocaleDateString('ru');
-      const statusBadge = t.payment_status === 'pending' ? ' <span style="font-size:10px;color:var(--mt)">(ожидает)</span>' : '';
-      const desc = isPlus ? ('Пополнение баланса' + statusBadge) : 'Списание за показы';
+      const desc = isPlus ? 'Пополнение баланса' : 'Списание за показы';
       return `<tr><td style="color:var(--mt)">${date}</td><td>${desc}</td><td style="color:${color};font-weight:600">${sign}${Math.abs(t.amount_rub).toLocaleString('ru')} ₽</td><td>${(t.balance_after||0).toLocaleString('ru')} ₽</td></tr>`;
     }).join('');
+    el.innerHTML = `<table class="tbl"><thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th><th>Баланс после</th></tr></thead><tbody>${rows}</tbody></table>`;
   } catch(e) { console.error('transactions error', e); }
 }
-function cnt(input, id, max) {
-  const l = input.value.length;
-  const el = document.getElementById(id);
-  el.textContent = l + '/' + max;
-  el.className = 'counter' + (l >= max ? ' over' : l > max*0.85 ? ' warn' : '');
 }
 function updBudget() {
   const v = parseInt(document.getElementById('f-budget').value) || 0;
