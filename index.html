@@ -648,7 +648,6 @@ async function loadTransactions() {
     el.innerHTML = `<table class="tbl"><thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th><th>Баланс после</th></tr></thead><tbody>${rows}</tbody></table>`;
   } catch(e) { console.error('transactions error', e); }
 }
-}
 function updBudget() {
   const v = parseInt(document.getElementById('f-budget').value) || 0;
   document.getElementById('budget-shows').textContent = v >= 1000 ? v.toLocaleString('ru') + ' показов' : v > 0 ? '⚠️ Мин. 1 000 ₽' : '— показов';
