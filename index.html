@@ -801,11 +801,18 @@ function selTopup(el, amt) {
   el.classList.add('selected'); selAmt = amt;
   const cd = document.getElementById('custom-topup');
   if (cd) cd.style.display = amt === 0 ? 'block' : 'none';
-}
 function doTopup() {
-  const amt = selAmt || parseInt(document.getElementById('custom-amt')?.value) || 0;
+  if (selAmt === 0) {
+    const customVal = parseInt(document.getElementById('custom-amt')?.value) || 0;
+    if (customVal <= 0) {
+      document.getElementById('custom-topup').style.display = 'block';
+      document.getElementById('custom-amt').focus();
+      return;
+    }
+  }
+  const amt = selAmt !== 0 ? selAmt : parseInt(document.getElementById('custom-amt')?.value) || 0;
   if (amt <= 0) { alert('Введите сумму пополнения'); return; }
-  const token = localStorage.getItem('adv_token');
+  const token = localStorage.getItem('pc_api_key');
   fetch('https://romptcash-backend.onrender.com/api/payments/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-advertiser-token': token },
@@ -819,7 +826,8 @@ function doTopup() {
       alert('Ошибка: ' + (data.error || 'Неизвестная ошибка'));
     }
   })
-  .catch(() => alert('Ошибка соединения с сервером'));
+  .catch(e => { console.error(e); alert('Ошибка соединения с сервером'); });
+}
 }
 function buildChart() {
   const chart = document.getElementById('chart');
@@ -831,3 +839,5 @@ function buildChart() {
 </script>
 </body>
 </html>
+
+
