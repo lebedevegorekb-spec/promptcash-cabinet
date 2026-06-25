@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8"/>
@@ -206,7 +206,7 @@ select.form-input{cursor:pointer}
             <div class="form-group">
               <div class="form-label">Бюджет кампании</div>
               <div style="display:flex;gap:10px;align-items:center">
-                <input class="form-input" id="f-budget" type="number" min="1000" step="500" placeholder="Минимум 1 000 ₽" oninput="updBudget()" style="max-width:220px"/>
+                <input class="form-input" id="f-budget" type="number" placeholder="Минимум 1 000 ₽" oninput="updBudget()" style="max-width:220px"/>
                 <span style="color:var(--mt);font-size:13px" id="budget-shows">— показов</span>
               </div>
               <div class="form-hint">1 показ = 1 ₽. Это лимит — реальное списание идёт за каждый показ с вашего общего баланса.</div>
@@ -312,13 +312,13 @@ select.form-input{cursor:pointer}
           <div class="topup-opt" onclick="selTopup(this,5000)"><div class="amt">5 000 ₽</div><div class="shows">5 000 показов</div></div>
           <div class="topup-opt" onclick="selTopup(this,10000)"><div class="amt">10 000 ₽</div><div class="shows">10 000 показов</div></div>
           <div class="topup-opt" onclick="selTopup(this,25000)"><div class="amt">25 000 ₽</div><div class="shows">25 000 показов</div></div>
-          <div class="topup-opt" onclick="selTopup(this,0)"><div class="amt">Своя</div><div class="shows">от 1 000 ₽</div></div>
+          <div class="topup-opt" onclick="selTopup(this,0)"><div class="amt">Своя</div><div class="shows">любая сумма</div></div>
         </div>
         <div id="custom-topup" style="display:none;margin-bottom:16px">
-          <input class="form-input" type="number" placeholder="Введите сумму (мин. 1 000 ₽)" min="1000" step="500" id="custom-amt" style="max-width:260px"/>
+          <input class="form-input" type="number" placeholder="Введите сумму в рублях" id="custom-amt" style="max-width:260px"/>
         </div>
         <div class="alert warn">⏳ Онлайн-оплата скоро. Сейчас пополнение по запросу: напишите на ads@promptcash.io</div>
-        <button class="btn btn-primary" onclick="doTopup()">Запросить пополнение →</button>
+        <button class="btn btn-primary" onclick="doTopup()">Оплатить через ЮKassa →</button>
       </div>
       <div class="card">
         <div class="card-title">📋 История транзакций</div>
@@ -405,9 +405,9 @@ select.form-input{cursor:pointer}
       <div class="topup-opt" onclick="selTopup(this,5000)"><div class="amt">5 000 ₽</div><div class="shows">5 000 показов</div></div>
       <div class="topup-opt" onclick="selTopup(this,10000)"><div class="amt">10 000 ₽</div><div class="shows">10 000 показов</div></div>
       <div class="topup-opt" onclick="selTopup(this,25000)"><div class="amt">25 000 ₽</div><div class="shows">25 000 показов</div></div>
-      <div class="topup-opt" onclick="selTopup(this,0)"><div class="amt">Своя</div><div class="shows">от 1 000 ₽</div></div>
+      <div class="topup-opt" onclick="selTopup(this,0)"><div class="amt">Своя</div><div class="shows">любая сумма</div></div>
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="doTopup()">Запросить пополнение →</button>
+    <button class="btn btn-primary" style="width:100%" onclick="doTopup()">Оплатить через ЮKassa →</button>
   </div>
 </div>
 
@@ -801,16 +801,25 @@ function selTopup(el, amt) {
   if (cd) cd.style.display = amt === 0 ? 'block' : 'none';
 }
 function doTopup() {
+function doTopup() {
   const amt = selAmt || parseInt(document.getElementById('custom-amt')?.value) || 0;
-  if (amt < 1000) { alert('Минимальная сумма — 1 000 ₽'); return; }
-  alert(`Заявка на пополнение ${amt.toLocaleString('ru')} ₽ отправлена.\n\nНапишите на ads@promptcash.io для оплаты. Скоро добавим автоматическую оплату через ЮKassa.`);
-  closeModal('modal-topup');
+  if (amt <= 0) { alert('Введите сумму пополнения'); return; }
+  const token = localStorage.getItem('adv_token');
+  fetch('https://romptcash-backend.onrender.com/api/payments/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-advertiser-token': token },
+    body: JSON.stringify({ amountRub: amt })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.confirmationUrl) {
+      window.location.href = data.confirmationUrl;
+    } else {
+      alert('Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+    }
+  })
+  .catch(() => alert('Ошибка соединения с сервером'));
 }
-
-function buildChart() {
-  const chart = document.getElementById('chart');
-  const vals = Array.from({length:30}, () => Math.floor(Math.random()*500+100));
-  const max = Math.max(...vals);
   chart.innerHTML = vals.map(v => `<div class="bar" style="height:${Math.round(v/max*100)}%" title="${v} показов"></div>`).join('');
 }
 </script>
