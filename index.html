@@ -633,18 +633,23 @@ async function toggleCamp(id, status) {
 }
 
 async function loadTransactions() {
+async function loadTransactions() {
   try {
     const txs = await apiFetch('/advertiser/transactions');
     const el = document.getElementById('transactions-list');
-    if (txs.length === 0) { el.innerHTML = '<div class="loading">Нет транзакций</div>'; return; }
+    if (!txs || txs.length === 0) { el.innerHTML = '<div class="loading">Нет транзакций</div>'; return; }
     const rows = txs.map(t => {
-      const isPlus = t.type === 'topup';
+      const isPlus = t.type === 'topup' || t.type === 'topup_pending' || t.amount_rub > 0;
       const color = isPlus ? 'var(--g)' : 'var(--red)';
+      const sign = isPlus ? '+' : '';
       const date = new Date(t.created_at).toLocaleDateString('ru');
-      const desc = t.description || (isPlus ? 'Пополнение баланса' : 'Списание');
-      return `<tr><td style="color:var(--mt)">${date}</td><td>${desc}</td><td style="color:${color};font-weight:600">${t.amount_rub.toLocaleString('ru')} ₽</td><td>${t.balance_after.toLocaleString('ru')} ₽</td></tr>`;
+      const statusBadge = t.payment_status === 'pending' ? ' <span style="font-size:10px;color:var(--mt)">(ожидает)</span>' : '';
+      const desc = isPlus ? ('Пополнение баланса' + statusBadge) : 'Списание за показы';
+      return `<tr><td style="color:var(--mt)">${date}</td><td>${desc}</td><td style="color:${color};font-weight:600">${sign}${Math.abs(t.amount_rub).toLocaleString('ru')} ₽</td><td>${(t.balance_after||0).toLocaleString('ru')} ₽</td></tr>`;
     }).join('');
     el.innerHTML = `<table class="tbl"><thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th><th>Баланс после</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch(e) { console.error('transactions error', e); }
+}
   } catch(e) {}
 }
 
