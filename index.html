@@ -793,13 +793,13 @@ function showPage(id) {
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
-
 let selAmt = 1000;
 function selTopup(el, amt) {
   document.querySelectorAll('.topup-opt').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected'); selAmt = amt;
+  el.classList.add('selected');
+  selAmt = amt;
   const cd = document.getElementById('custom-topup');
+  if (cd) cd.style.display = amt === 0 ? 'block' : 'none';
 }
 function doTopup() {
   if (selAmt === 0) {
