@@ -777,13 +777,13 @@ function copyApiKey() {
   event.target.textContent = 'Скопировано!';
   setTimeout(() => event.target.textContent = 'Копировать', 1500);
 }
-
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   const map = {dashboard:0, campaigns:1, 'new-campaign':2, billing:3, profile:4, help:5};
   if (map[id] !== undefined) document.querySelectorAll('.sb-item')[map[id]].classList.add('active');
+  if (id === 'billing') loadTransactions();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
