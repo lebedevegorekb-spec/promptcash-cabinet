@@ -633,7 +633,6 @@ async function toggleCamp(id, status) {
 }
 
 async function loadTransactions() {
-async function loadTransactions() {
   try {
     const txs = await apiFetch('/advertiser/transactions');
     const el = document.getElementById('transactions-list');
