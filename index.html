@@ -648,8 +648,6 @@ async function loadTransactions() {
     }).join('');
     el.innerHTML = `<table class="tbl"><thead><tr><th>Дата</th><th>Операция</th><th>Сумма</th><th>Баланс после</th></tr></thead><tbody>${rows}</tbody></table>`;
   } catch(e) { console.error('transactions error', e); }
-}
-  } catch(e) {}
 function cnt(input, id, max) {
   const l = input.value.length;
   const el = document.getElementById(id);
