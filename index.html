@@ -803,7 +803,6 @@ function selTopup(el, amt) {
   if (cd) cd.style.display = amt === 0 ? 'block' : 'none';
 }
 function doTopup() {
-function doTopup() {
   const amt = selAmt || parseInt(document.getElementById('custom-amt')?.value) || 0;
   if (amt <= 0) { alert('Введите сумму пополнения'); return; }
   const token = localStorage.getItem('adv_token');
@@ -822,13 +821,13 @@ function doTopup() {
   })
   .catch(() => alert('Ошибка соединения с сервером'));
 }
-  chart.innerHTML = vals.map(v => `<div class="bar" style="height:${Math.round(v/max*100)}%" title="${v} показов"></div>`).join('');
-}
 function buildChart() {
   const chart = document.getElementById('chart');
   if (!chart) return;
   const vals = Array.from({length:30}, () => Math.floor(Math.random()*500+100));
   const max = Math.max(...vals);
+  chart.innerHTML = vals.map(v => `<div class="bar" style="height:${Math.round(v/max*100)}%" title="${v} показов"></div>`).join('');
+}
   chart.innerHTML = vals.map(v => `<div class="bar" style="height:${Math.round(v/max*100)}%" title="${v} показов"></div>`).join('');
 }
 </script>
