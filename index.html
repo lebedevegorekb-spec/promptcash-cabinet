@@ -395,10 +395,11 @@ select.form-input{cursor:pointer}
 </div>
 
 <div class="modal-overlay" id="modal-topup">
+<div class="modal-overlay" id="modal-topup">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-topup')">×</button>
     <h2>Пополнить баланс</h2>
-    <p>Выберите сумму. Сейчас пополнение обрабатывается вручную.</p>
+    <p>Выберите сумму или введите свою.</p>
     <div class="topup-grid">
       <div class="topup-opt selected" onclick="selTopup(this,1000)"><div class="amt">1 000 ₽</div><div class="shows">1 000 показов</div></div>
       <div class="topup-opt" onclick="selTopup(this,3000)"><div class="amt">3 000 ₽</div><div class="shows">3 000 показов</div></div>
@@ -407,7 +408,12 @@ select.form-input{cursor:pointer}
       <div class="topup-opt" onclick="selTopup(this,25000)"><div class="amt">25 000 ₽</div><div class="shows">25 000 показов</div></div>
       <div class="topup-opt" onclick="selTopup(this,0)"><div class="amt">Своя</div><div class="shows">любая сумма</div></div>
     </div>
+    <div id="custom-topup" style="display:none;margin-bottom:16px">
+      <input class="form-input" type="number" placeholder="Введите сумму в рублях" id="custom-amt" style="width:100%"/>
+    </div>
     <button class="btn btn-primary" style="width:100%" onclick="doTopup()">Оплатить через ЮKassa →</button>
+  </div>
+</div>
   </div>
 </div>
 
