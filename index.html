@@ -828,8 +828,6 @@ function buildChart() {
   const max = Math.max(...vals);
   chart.innerHTML = vals.map(v => `<div class="bar" style="height:${Math.round(v/max*100)}%" title="${v} показов"></div>`).join('');
 }
-  chart.innerHTML = vals.map(v => `<div class="bar" style="height:${Math.round(v/max*100)}%" title="${v} показов"></div>`).join('');
-}
 </script>
 </body>
 </html>
