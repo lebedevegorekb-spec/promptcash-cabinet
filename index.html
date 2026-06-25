@@ -815,7 +815,7 @@ function doTopup() {
   const token = localStorage.getItem('pc_api_key');
   fetch('https://romptcash-backend.onrender.com/api/payments/create', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-advertiser-token': token },
+    headers: { 'Content-Type': 'application/json', 'x-api-key': token },
     body: JSON.stringify({ amountRub: amt })
   })
   .then(r => r.json())
@@ -838,5 +838,6 @@ function buildChart() {
 </script>
 </body>
 </html>
+
 
 
