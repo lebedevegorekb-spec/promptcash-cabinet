@@ -451,7 +451,7 @@ select.form-input{cursor:pointer}
 </div>
 
 <script>
-const API = 'https://romptcash-backend.onrender.com';
+const API = 'https://api.gptcash.ru';
 let API_KEY = localStorage.getItem('pc_api_key');
 let ADVERTISER = JSON.parse(localStorage.getItem('pc_advertiser') || 'null');
 let uploadedImageUrl = null;
@@ -804,7 +804,7 @@ function doTopup() {
   const amt = selAmt !== 0 ? selAmt : parseInt(document.getElementById('custom-amt')?.value) || 0;
   if (amt <= 0) { alert('Введите сумму пополнения'); return; }
   const token = localStorage.getItem('pc_api_key');
-  fetch('https://romptcash-backend.onrender.com/api/payments/create', {
+  fetch('https://api.gptcash.ru/api/payments/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': token },
     body: JSON.stringify({ amountRub: amt })
@@ -829,6 +829,7 @@ function buildChart() {
 </script>
 </body>
 </html>
+
 
 
 
