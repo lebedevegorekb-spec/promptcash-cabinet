@@ -231,8 +231,8 @@ select.form-input{cursor:pointer}
                 </label>
                 <label style="border:2px solid var(--bd2);border-radius:10px;padding:14px;cursor:pointer;display:block" id="fmt-above-label">
                   <input type="radio" name="placementType" value="above_input" onchange="updFormat()" style="margin-right:8px"/>
-                  <strong>Над инпутом</strong>
-                  <div style="font-size:11px;color:var(--mt);margin-top:6px">Текст над полем ввода, макс. 80 символов</div>
+                  <strong>Пока думает</strong>
+                  <div style="font-size:11px;color:var(--mt);margin-top:6px">Показ пока ИИ генерирует ответ, макс. 80 символов</div>
                 </label>
               </div>
             </div>
@@ -747,7 +747,7 @@ async function submitCampaign() {
   alertEl.innerHTML = '';
 
   if (!title) return alertEl.innerHTML = '<div class="alert warn">Заполните заголовок</div>';
-  if (!desc) return alertEl.innerHTML = '<div class="alert warn">Заполните описание</div>';
+  if (!desc && placementType !== 'above_input') return alertEl.innerHTML = '<div class="alert warn">Заполните описание</div>';
   if (!url || !url.startsWith('https://')) return alertEl.innerHTML = '<div class="alert warn">Введите корректный URL (https://)</div>';
   if (!budget || budget < 1000) return alertEl.innerHTML = '<div class="alert warn">Минимальный бюджет — 1 000 ₽</div>';
   if (placementType === 'image_card' && !uploadedImageUrl) return alertEl.innerHTML = '<div class="alert warn">Загрузите изображение 280×140px для этого формата</div>';
@@ -850,6 +850,7 @@ function buildChart() {
 </script>
 </body>
 </html>
+
 
 
 
