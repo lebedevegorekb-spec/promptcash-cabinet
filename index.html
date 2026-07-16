@@ -217,7 +217,7 @@ select.form-input{cursor:pointer}
           <div class="card">
             <div class="card-title">📋 Формат объявления</div>
             <div class="form-group">
-              <div class="form-label">Выберите формат</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
               <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
                 <label style="border:2px solid var(--g);border-radius:10px;padding:14px;cursor:pointer;display:block" id="fmt-text-label">
                   <input type="radio" name="placementType" value="text_banner" checked onchange="updFormat()" style="margin-right:8px"/>
@@ -228,11 +228,6 @@ select.form-input{cursor:pointer}
                   <input type="radio" name="placementType" value="image_card" onchange="updFormat()" style="margin-right:8px"/>
                   <strong>Карточка с фото</strong>
                   <div style="font-size:11px;color:var(--mt);margin-top:6px">Боковая карточка, изображение 280×140px</div>
-                </label>
-                <label style="border:2px solid var(--bd2);border-radius:10px;padding:14px;cursor:pointer;display:block" id="fmt-above-label">
-                  <input type="radio" name="placementType" value="above_input" onchange="updFormat()" style="margin-right:8px"/>
-                  <strong>Пока думает</strong>
-                  <div style="font-size:11px;color:var(--mt);margin-top:6px">Показ пока ИИ генерирует ответ, макс. 80 символов</div>
                 </label>
               </div>
             </div>
@@ -674,20 +669,13 @@ function valUrl(input) {
 function updFormat() {
   const val = document.querySelector('input[name="placementType"]:checked').value;
   const isImage = val === 'image_card';
-  const isAbove = val === 'above_input';
   document.getElementById('image-upload-block').style.display = isImage ? 'block' : 'none';
   document.getElementById('fmt-text-label').style.borderColor = val === 'text_banner' ? 'var(--g)' : 'var(--bd2)';
   document.getElementById('fmt-image-label').style.borderColor = isImage ? 'var(--g)' : 'var(--bd2)';
-  document.getElementById('fmt-above-label').style.borderColor = isAbove ? 'var(--g)' : 'var(--bd2)';
   document.getElementById('preview-image-card').style.display = isImage ? 'block' : 'none';
-  document.getElementById('preview-text-banner').style.display = (!isImage && !isAbove) ? 'block' : 'none';
-  const abovePreview = document.getElementById('preview-above-input');
-  if (abovePreview) abovePreview.style.display = isAbove ? 'block' : 'none';
-  // Ограничение символов для above_input
+  document.getElementById('preview-text-banner').style.display = isImage ? 'none' : 'block';
   const titleInput = document.getElementById('f-title');
-  const descInput = document.getElementById('f-desc');
-  if (titleInput) titleInput.maxLength = isAbove ? 80 : 60;
-  if (descInput) { descInput.disabled = isAbove; descInput.style.opacity = isAbove ? '0.4' : '1'; }
+  if (titleInput) titleInput.maxLength = 60;
 }
 async function handleImageUpload(e) {
   const file = e.target.files[0];
