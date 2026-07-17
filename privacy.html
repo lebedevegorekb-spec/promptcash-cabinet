@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Privacy Policy — Vela</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#161826;color:#e9e9ed;line-height:1.7;padding:40px 20px}
+.wrap{max-width:760px;margin:0 auto}
+.brand{font-weight:300;letter-spacing:0.18em;text-transform:uppercase;font-size:15px;color:#2fbf80;margin-bottom:40px;display:block}
+h1{font-size:32px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px}
+.date{font-size:13px;color:rgba(233,233,237,.55);margin-bottom:40px}
+h2{font-size:18px;font-weight:600;margin:36px 0 12px;color:#e9e9ed}
+p{font-size:15px;color:rgba(233,233,237,.8);margin-bottom:16px}
+ul{padding-left:20px;margin-bottom:16px}
+li{font-size:15px;color:rgba(233,233,237,.8);margin-bottom:8px}
+strong{color:#e9e9ed}
+a{color:#2fbf80}
+hr{border:none;border-top:1px solid rgba(233,233,237,.1);margin:40px 0}
+.contact{background:#1e2030;border:1px solid rgba(233,233,237,.1);border-radius:12px;padding:24px;margin-top:40px}
+.contact p{margin-bottom:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="brand">Vela</span>
+  <h1>Privacy Policy</h1>
+  <p class="date">Effective date: July 1, 2026 · Last updated: July 17, 2026</p>
+
+  <p>This Privacy Policy describes how the <strong>Vela</strong> Chrome extension ("Extension", "we", "our") collects, uses, and protects information when you use our service. By installing the Extension you agree to this policy.</p>
+
+  <h2>1. What We Collect</h2>
+  <p>The Extension collects only the minimum data necessary to operate the ad-reward platform:</p>
+  <ul>
+    <li><strong>Anonymous installation ID</strong> — a randomly generated UUID created on your device at install time. It is not linked to your identity, Google account, or any personal information.</li>
+    <li><strong>Impression metadata</strong> — when an ad is shown we record: the anonymous installation ID, campaign ID, ad placement type, visibility duration (ms), tab-active state, and timestamp. No browsing history or page content is included.</li>
+    <li><strong>Payout email</strong> — provided voluntarily by you when requesting a payout. Used solely to process the transfer.</li>
+  </ul>
+
+  <h2>2. What We Do NOT Collect</h2>
+  <ul>
+    <li>Your ChatGPT or Claude prompts, messages, or chat history.</li>
+    <li>ChatGPT or Claude account credentials, cookies, or authentication tokens.</li>
+    <li>Browsing history outside of chatgpt.com and claude.ai.</li>
+    <li>Any personally identifiable information beyond a voluntary payout email.</li>
+    <li>IP addresses stored in association with the anonymous ID.</li>
+  </ul>
+
+  <h2>3. Single Purpose</h2>
+  <p>The Extension has one purpose: to display clearly-labelled sponsored ad cards on chatgpt.com and claude.ai and credit the user a fixed reward per valid impression. All code and data collection is strictly limited to this function. The Extension does not inject code into ChatGPT responses, does not modify AI outputs, and does not read page content.</p>
+
+  <h2>4. How We Use the Data</h2>
+  <ul>
+    <li>To verify that an impression was valid (tab active, card visible ≥ 1.5 s, daily limits not exceeded).</li>
+    <li>To credit the reward to your anonymous wallet.</li>
+    <li>To detect fraud (e.g. automated impression generation).</li>
+    <li>To process payout requests when you provide your email.</li>
+  </ul>
+
+  <h2>5. Data Sharing</h2>
+  <p>We do not sell, rent, or share your data with third parties for advertising or analytics purposes. Impression metadata is shared only with the advertiser whose ad was shown, in aggregated and anonymised form (total impressions, no user-level data). Payout processing may involve a payment service provider (e.g. YooKassa) who receives only the amount and payout email.</p>
+
+  <h2>6. Data Retention</h2>
+  <p>Anonymous impression records are retained for up to 12 months for fraud prevention and financial reporting. Payout emails are deleted within 30 days after the transfer is completed. You may request deletion at any time by contacting us.</p>
+
+  <h2>7. Chrome Permissions</h2>
+  <p>The Extension requests the following permissions:</p>
+  <ul>
+    <li><strong>storage</strong> — to save your anonymous ID, settings, and local stats cache on your device.</li>
+    <li><strong>host_permissions for chatgpt.com, chat.openai.com, claude.ai</strong> — to inject the ad card UI into these pages only. No data from these pages is read or transmitted.</li>
+  </ul>
+
+  <h2>8. Security</h2>
+  <p>All data is transmitted over HTTPS. The ad card is rendered in an isolated Shadow DOM and cannot access ChatGPT or Claude page content. We do not use <code>eval()</code> or remote code execution.</p>
+
+  <h2>9. Children</h2>
+  <p>The Extension is not directed at children under 13. We do not knowingly collect any information from children.</p>
+
+  <h2>10. Changes to This Policy</h2>
+  <p>We may update this policy. Material changes will be announced via the Extension update notes. Continued use after changes constitutes acceptance.</p>
+
+  <h2>11. Your Rights</h2>
+  <p>You may request access to or deletion of your data at any time by contacting us. Because the anonymous ID is not linked to your identity, we may ask you to provide it (visible in the Extension's debug panel) to locate your records.</p>
+
+  <hr/>
+
+  <div class="contact">
+    <p><strong>Contact</strong><br/>
+    For privacy questions or data deletion requests:<br/>
+    Email: <a href="mailto:privacy@gptcash.ru">privacy@gptcash.ru</a></p>
+  </div>
+</div>
+</body>
+</html>
