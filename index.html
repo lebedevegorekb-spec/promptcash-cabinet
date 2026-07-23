@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>GPTCash — Рекламный кабинет</title>
+<title>Vela — Рекламный кабинет</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -120,12 +120,12 @@ select.form-input{cursor:pointer}
 .detail-row .v{color:var(--tx);text-align:right;max-width:60%;word-break:break-word}
 @media(max-width:900px){.sidebar{display:none}.main{margin-left:0}.stats-row{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}}
 </style>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 rx=%2236%22 fill=%22%2310a37f%22/><text x=%2290%22 y=%2295%22 font-family=%22Arial,sans-serif%22 font-size=%2252%22 font-weight=%22900%22 fill=%22white%22 text-anchor=%22middle%22>GPT</text><text x=%2290%22 y=%22148%22 font-family=%22Arial,sans-serif%22 font-size=%2236%22 font-weight=%22700%22 fill=%22rgba(255,255,255,0.75)%22 text-anchor=%22middle%22>cash</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 180 180%22><rect width=%22180%22 height=%22180%22 rx=%2236%22 fill=%22%23161826%22/><text x=%2290%22 y=%22115%22 font-family=%22Arial,sans-serif%22 font-size=%2280%22 font-weight=%22300%22 fill=%22white%22 text-anchor=%22middle%22>V</text></svg>">
 </head>
 <body>
 
 <div class="gate" id="gate" style="display:none">
-  <div class="logo" style="font-size:22px;font-weight:800">💰 GPTCash</div>
+  <div class="logo" style="font-weight:300;letter-spacing:0.18em;text-transform:uppercase;font-size:20px">Vela</div>
   <p>Для доступа к кабинету нужно войти</p>
   <a href="auth.html" class="btn btn-primary">Войти / Зарегистрироваться</a>
 </div>
@@ -192,7 +192,7 @@ select.form-input{cursor:pointer}
 
     <!-- НОВАЯ КАМПАНИЯ -->
     <div class="page" id="page-new-campaign">
-      <div class="ph"><h1>Новая кампания</h1><p>Заполни форму — объявление появится у пользователей GPTCash</p></div>
+      <div class="ph"><h1>Новая кампания</h1><p>Заполни форму — объявление появится у пользователей Vela</p></div>
       <div id="form-alert"></div>
 
       <div style="display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start">
@@ -213,12 +213,10 @@ select.form-input{cursor:pointer}
               <div class="form-hint">1 показ = 1 ₽. Это лимит — реальное списание идёт за каждый показ с вашего общего баланса.</div>
             </div>
           </div>
-
           <div class="card">
             <div class="card-title">📋 Формат объявления</div>
             <div class="form-group">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
                 <label style="border:2px solid var(--g);border-radius:10px;padding:14px;cursor:pointer;display:block" id="fmt-text-label">
                   <input type="radio" name="placementType" value="text_banner" checked onchange="updFormat()" style="margin-right:8px"/>
                   <strong>Текстовый попап</strong>
@@ -236,6 +234,10 @@ select.form-input{cursor:pointer}
               <input type="file" id="f-image" accept="image/png,image/jpeg,image/webp" onchange="handleImageUpload(event)" class="form-input"/>
               <div class="form-hint" id="image-hint">PNG, JPEG или WebP. Точный размер 280×140px.</div>
               <div id="image-preview-wrap" style="display:none;margin-top:10px">
+                <img id="image-preview" style="width:280px;height:140px;border-radius:8px;border:1px solid var(--bd2);object-fit:cover"/>
+              </div>
+            </div>
+          </div>
                 <img id="image-preview" style="width:280px;height:140px;border-radius:8px;border:1px solid var(--bd2);object-fit:cover"/>
               </div>
             </div>
@@ -390,7 +392,7 @@ select.form-input{cursor:pointer}
       <div class="card">
         <div class="card-title">📞 Связаться с нами</div>
         <div style="font-size:13px;color:var(--mt);line-height:2.2">
-          Email: <a href="mailto:ads@gptcash.ru" style="color:var(--g)">ads@gptcash.ru</a>
+          Email: <a href="mailto:lebedevegor.ekb@gmail.com" style="color:var(--g)">lebedevegor.ekb@gmail.com</a>
         </div>
       </div>
     </div>
@@ -838,6 +840,8 @@ function buildChart() {
 </script>
 </body>
 </html>
+
+
 
 
 
