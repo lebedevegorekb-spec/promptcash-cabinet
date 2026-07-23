@@ -119,6 +119,33 @@ const API = 'https://romptcash-backend.onrender.com';
 const CABINET_URL = 'index.html';
 let pendingEmail = '';
 
+function getReferralParams() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if (ref) {
+    sessionStorage.setItem('vela_ref', ref);
+    if (params.get('referral_link_id')) sessionStorage.setItem('vela_referral_link_id', params.get('referral_link_id'));
+    if (params.get('utm_source')) sessionStorage.setItem('vela_utm_source', params.get('utm_source'));
+    if (params.get('utm_medium')) sessionStorage.setItem('vela_utm_medium', params.get('utm_medium'));
+    if (params.get('utm_campaign')) sessionStorage.setItem('vela_utm_campaign', params.get('utm_campaign'));
+    if (params.get('utm_content')) sessionStorage.setItem('vela_utm_content', params.get('utm_content'));
+  }
+}
+getReferralParams();
+
+function getReferralPayload() {
+  const ref = sessionStorage.getItem('vela_ref');
+  if (!ref) return {};
+  return {
+    ref,
+    referral_link_id: sessionStorage.getItem('vela_referral_link_id') || null,
+    utm_source: sessionStorage.getItem('vela_utm_source') || null,
+    utm_medium: sessionStorage.getItem('vela_utm_medium') || null,
+    utm_campaign: sessionStorage.getItem('vela_utm_campaign') || null,
+    utm_content: sessionStorage.getItem('vela_utm_content') || null,
+  };
+}
+
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
@@ -205,7 +232,7 @@ async function doRegister() {
     const res = await fetch(API + '/auth/register', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ companyName, industry, website, email, password })
+      body: JSON.stringify({ companyName, industry, website, email, password, ...getReferralPayload() })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
@@ -248,4 +275,5 @@ async function resendVerification() {
 </script>
 </body>
 </html>
+
 
