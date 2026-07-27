@@ -41,13 +41,7 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;min-height:
   <div class="card">
     <div id="login-form">
       <div id="alert-box"></div>
-      <div class="fg">
-        <label class="fl">Я — </label>
-        <div class="type-row">
-          <div class="type-opt selected" id="type-blogger" onclick="selType('BLOGGER')">Блогер / партнёр</div>
-          <div class="type-opt" id="type-advertiser" onclick="selType('ADVERTISER')">Рекламодатель</div>
-        </div>
-      </div>
+
       <div class="fg">
         <label class="fl">Имя</label>
         <input class="fi" type="text" id="p-name" placeholder="Как к вам обращаться"/>
@@ -68,13 +62,7 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;min-height:
 </div>
 <script>
 const API = 'https://api.gptcash.ru';
-let selectedType = 'BLOGGER';
-
-function selType(t) {
-  selectedType = t;
-  document.getElementById('type-blogger').classList.toggle('selected', t === 'BLOGGER');
-  document.getElementById('type-advertiser').classList.toggle('selected', t === 'ADVERTISER');
-}
+const selectedType = 'BLOGGER';
 
 function showAlert(msg, type) {
   document.getElementById('alert-box').innerHTML = '<div class="alert ' + type + '">' + msg + '</div>';
@@ -110,3 +98,4 @@ async function doLogin() {
 </script>
 </body>
 </html>
+
