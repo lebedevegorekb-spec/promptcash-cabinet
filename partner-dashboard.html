@@ -18,6 +18,10 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 .card-title{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
 .code-box{display:flex;align-items:center;gap:10px;background:#262940;border:1px solid #333650;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;width:fit-content}
 .copy-btn{background:#2fbf80;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:normal}
+.balance-amt{font-size:32px;font-weight:800;color:#2fbf80;margin-bottom:4px}
+.balance-hint{font-size:12px;color:#6b6e8a;margin-top:8px}
+.btn-disabled{background:#333650;color:#6b6e8a;cursor:not-allowed;opacity:.8}
+.btn-disabled:hover{background:#333650}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif}
 .btn-primary{background:#2fbf80;color:#fff}
 .btn-primary:hover{background:#26a06c}
@@ -52,6 +56,12 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
   <div class="card">
     <div class="card-title">Твой персональный код</div>
     <div class="code-box"><span id="my-code">—</span><button class="copy-btn" onclick="copyCode()">Копировать</button></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Баланс</div>
+    <div class="balance-amt" id="total-balance">0 ₽</div>
+    <button class="btn btn-disabled" disabled>Вывести</button>
+    <div class="balance-hint">Вывод доступен от 5 000 ₽</div>
   </div>
 
   <div class="card">
@@ -113,6 +123,8 @@ async function loadLinks() {
   try {
     const links = await apiFetch('/partner/referral-links');
     const el = document.getElementById('links-list');
+    const totalIncome = (links || []).reduce((sum, l) => sum + Number(l.income_rub || 0), 0);
+    document.getElementById('total-balance').textContent = totalIncome.toLocaleString('ru') + ' ₽';
     if (!links || links.length === 0) {
       el.innerHTML = '<div class="loading">Ссылок пока нет. Создай первую.</div>';
       return;
@@ -161,3 +173,5 @@ init();
 </script>
 </body>
 </html>
+
+
