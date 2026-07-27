@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vela — Партнёрский кабинет</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:14px;line-height:1.6;min-height:100vh;padding:32px}
+.wrap{max-width:960px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.logo{font-weight:300;letter-spacing:0.18em;text-transform:uppercase;font-size:18px}
+.hi{color:#9a9db8;font-size:13px}
+.logout{background:none;border:1px solid #2a2d42;color:#9a9db8;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
+.logout:hover{border-color:#e55;color:#e55}
+.card{background:#1e2032;border:1px solid #2a2d42;border-radius:14px;padding:24px;margin-bottom:20px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.code-box{display:flex;align-items:center;gap:10px;background:#262940;border:1px solid #333650;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;width:fit-content}
+.copy-btn{background:#2fbf80;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:normal}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.btn-primary{background:#2fbf80;color:#fff}
+.btn-primary:hover{background:#26a06c}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:11px;font-weight:600;color:#9a9db8;text-transform:uppercase;letter-spacing:0.5px;padding:10px 12px;text-align:left;border-bottom:1px solid #2a2d42}
+.tbl td{padding:12px;border-bottom:1px solid #2a2d42;font-size:13px}
+.tbl tr:last-child td{border-bottom:none}
+.loading{color:#9a9db8;font-size:13px;padding:20px;text-align:center}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#1e2032;border:1px solid #2a2d42;border-radius:16px;padding:32px;max-width:440px;width:100%;position:relative}
+.modal h2{font-size:18px;font-weight:800;margin-bottom:20px}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:#9a9db8;font-size:20px;cursor:pointer}
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:11px;font-weight:600;color:#9a9db8;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.fi{width:100%;background:#262940;border:1px solid #333650;border-radius:8px;padding:10px 12px;color:#f0f0f0;font-size:13px;font-family:'Inter',sans-serif;outline:none}
+.fi:focus{border-color:#2fbf80}
+.result-box{display:none;background:#262940;border-radius:8px;padding:14px;margin-top:16px}
+.result-link{font-size:12px;color:#2fbf80;word-break:break-all;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="logo">Vela</div>
+      <div class="hi" id="hi-name">Партнёрский кабинет</div>
+    </div>
+    <button class="logout" onclick="logout()">Выйти</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Твой персональный код</div>
+    <div class="code-box"><span id="my-code">—</span><button class="copy-btn" onclick="copyCode()">Копировать</button></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Ссылки и статистика <button class="btn btn-primary" onclick="openModal()">+ Создать ссылку</button></div>
+    <div id="links-list"><div class="loading">Загрузка...</div></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-create">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>Создать ссылку</h2>
+    <div class="fg"><label class="fl">Название</label><input class="fi" id="f-name" placeholder="Instagram Reel"/></div>
+    <div class="fg"><label class="fl">Источник (utm_source)</label><input class="fi" id="f-source" placeholder="instagram"/></div>
+    <div class="fg"><label class="fl">Формат (utm_medium)</label><input class="fi" id="f-medium" placeholder="reels"/></div>
+    <div class="fg"><label class="fl">Кампания (utm_campaign)</label><input class="fi" id="f-campaign" placeholder="summer_2026"/></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="createLink()">Создать ссылку</button>
+    <div class="result-box" id="result-box">
+      <div class="result-link" id="result-link"></div>
+      <button class="copy-btn" onclick="copyResultLink()">Скопировать ссылку</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://api.gptcash.ru';
+const SESSION = localStorage.getItem('vela_partner_session');
+
+if (!SESSION) {
+  window.location.href = 'partner-login.html';
+}
+
+function logout() {
+  localStorage.removeItem('vela_partner_session');
+  localStorage.removeItem('vela_partner_id');
+  window.location.href = 'partner-login.html';
+}
+
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', 'x-partner-session': SESSION, ...(opts.headers || {}) }
+  });
+  if (res.status === 401) { logout(); throw new Error('Сессия истекла'); }
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Ошибка'); }
+  return res.json();
+}
+
+async function init() {
+  try {
+    const me = await apiFetch('/partner/me');
+    document.getElementById('hi-name').textContent = 'Привет, ' + (me.name || me.email) + '!';
+    document.getElementById('my-code').textContent = me.referral_code;
+  } catch(e) { console.error('me error', e); }
+  loadLinks();
+}
+
+async function loadLinks() {
+  try {
+    const links = await apiFetch('/partner/referral-links');
+    const el = document.getElementById('links-list');
+    if (!links || links.length === 0) {
+      el.innerHTML = '<div class="loading">Ссылок пока нет. Создай первую.</div>';
+      return;
+    }
+    const rows = links.map(l => `<tr><td>${l.name}</td><td>${l.clicks}</td><td>${l.registrations}</td><td>${l.paying_advertisers}</td><td>${l.spend_rub.toLocaleString('ru')} ₽</td><td style="color:#2fbf80;font-weight:600">${l.income_rub.toLocaleString('ru')} ₽</td></tr>`).join('');
+    el.innerHTML = '<table class="tbl"><thead><tr><th>Название</th><th>Клики</th><th>Регистрации</th><th>Платящие</th><th>Расход</th><th>Твой доход</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  } catch(e) { console.error('links error', e); }
+}
+
+function copyCode() {
+  const code = document.getElementById('my-code').textContent;
+  navigator.clipboard.writeText(code);
+  event.target.textContent = 'Скопировано!';
+  setTimeout(() => { event.target.textContent = 'Копировать'; }, 1500);
+}
+
+function copyResultLink() {
+  const link = document.getElementById('result-link').textContent;
+  navigator.clipboard.writeText(link);
+  event.target.textContent = 'Скопировано!';
+  setTimeout(() => { event.target.textContent = 'Скопировать ссылку'; }, 1500);
+}
+
+function openModal() { document.getElementById('modal-create').classList.add('open'); document.getElementById('result-box').style.display = 'none'; }
+function closeModal() { document.getElementById('modal-create').classList.remove('open'); }
+
+async function createLink() {
+  const name = document.getElementById('f-name').value;
+  const utm_source = document.getElementById('f-source').value;
+  const utm_medium = document.getElementById('f-medium').value;
+  const utm_campaign = document.getElementById('f-campaign').value;
+  if (!name) { alert('Введите название'); return; }
+
+  try {
+    const data = await apiFetch('/partner/referral-links', {
+      method: 'POST',
+      body: JSON.stringify({ name, utm_source, utm_medium, utm_campaign })
+    });
+    document.getElementById('result-link').textContent = data.url;
+    document.getElementById('result-box').style.display = 'block';
+    loadLinks();
+  } catch(e) { alert('Ошибка: ' + e.message); }
+}
+
+init();
+</script>
+</body>
+</html>

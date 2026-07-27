@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vela — Партнёрский кабинет</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.wrap{max-width:440px;width:100%}
+.logo{text-align:center;font-weight:300;letter-spacing:0.18em;text-transform:uppercase;font-size:20px;margin-bottom:8px}
+.subtitle{text-align:center;color:#9a9db8;font-size:14px;margin-bottom:32px}
+.card{background:#1e2032;border:1px solid #2a2d42;border-radius:16px;padding:32px}
+.fg{margin-bottom:18px}
+.fl{display:block;font-size:12px;font-weight:600;color:#9a9db8;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px}
+.fi{width:100%;background:#262940;border:1px solid #333650;border-radius:8px;padding:11px 14px;color:#f0f0f0;font-size:14px;font-family:'Inter',sans-serif;outline:none}
+.fi:focus{border-color:#2fbf80}
+.fi::placeholder{color:#6b6e8a}
+.type-row{display:flex;gap:8px;margin-bottom:18px}
+.type-opt{flex:1;padding:12px;border-radius:8px;border:1px solid #333650;background:#262940;color:#9a9db8;font-size:13px;font-weight:600;cursor:pointer;text-align:center;font-family:'Inter',sans-serif}
+.type-opt.selected{border-color:#2fbf80;background:rgba(47,191,128,.1);color:#fff}
+.btn{width:100%;background:#2fbf80;color:#fff;border:none;padding:13px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px}
+.btn:hover{background:#26a06c}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.alert{padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:18px;line-height:1.5}
+.alert.error{background:rgba(230,85,85,.1);border:1px solid rgba(230,85,85,.2);color:#e55}
+.alert.success{background:rgba(47,191,128,.1);border:1px solid rgba(47,191,128,.2);color:#2fbf80}
+.back-link{display:block;text-align:center;margin-top:20px;color:#6b6e8a;font-size:13px;text-decoration:none}
+.back-link:hover{color:#9a9db8}
+.pending{display:none;text-align:center}
+.pending .icon{font-size:48px;margin-bottom:16px}
+.pending h2{font-size:18px;font-weight:800;margin-bottom:10px}
+.pending p{color:#9a9db8;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Vela</div>
+  <div class="subtitle">Партнёрский кабинет</div>
+  <div class="card">
+    <div id="login-form">
+      <div id="alert-box"></div>
+      <div class="fg">
+        <label class="fl">Я — </label>
+        <div class="type-row">
+          <div class="type-opt selected" id="type-blogger" onclick="selType('BLOGGER')">Блогер / партнёр</div>
+          <div class="type-opt" id="type-advertiser" onclick="selType('ADVERTISER')">Рекламодатель</div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Имя</label>
+        <input class="fi" type="text" id="p-name" placeholder="Как к вам обращаться"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Email</label>
+        <input class="fi" type="email" id="p-email" placeholder="you@example.ru"/>
+      </div>
+      <button class="btn" onclick="doLogin()" id="login-btn">Получить ссылку для входа</button>
+    </div>
+    <div class="pending" id="pending-screen">
+      <div class="icon">📧</div>
+      <h2>Проверьте почту</h2>
+      <p>Мы отправили письмо на <strong id="pending-email"></strong> со ссылкой для входа в партнёрский кабинет.</p>
+    </div>
+  </div>
+  <a href="https://velaapp.ru" class="back-link">← Вернуться на сайт Vela</a>
+</div>
+<script>
+const API = 'https://api.gptcash.ru';
+let selectedType = 'BLOGGER';
+
+function selType(t) {
+  selectedType = t;
+  document.getElementById('type-blogger').classList.toggle('selected', t === 'BLOGGER');
+  document.getElementById('type-advertiser').classList.toggle('selected', t === 'ADVERTISER');
+}
+
+function showAlert(msg, type) {
+  document.getElementById('alert-box').innerHTML = '<div class="alert ' + type + '">' + msg + '</div>';
+}
+
+async function doLogin() {
+  const name = document.getElementById('p-name').value;
+  const email = document.getElementById('p-email').value;
+  if (!email) return showAlert('Введите email', 'error');
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Отправляем...';
+
+  try {
+    const res = await fetch(API + '/partner/register-or-login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, name, type: selectedType })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Ошибка');
+
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('pending-screen').style.display = 'block';
+    document.getElementById('pending-email').textContent = email;
+  } catch(e) {
+    showAlert(e.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Получить ссылку для входа';
+  }
+}
+</script>
+</body>
+</html>
