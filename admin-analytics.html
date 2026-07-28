@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vela — Аналитика</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:14px;line-height:1.6;padding:32px}
+.wrap{max-width:1200px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.logo{font-weight:300;letter-spacing:0.18em;text-transform:uppercase;font-size:18px}
+.period-box{display:flex;gap:8px;align-items:center}
+.period-box input{background:#262940;border:1px solid #333650;border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;width:80px;font-family:'Inter',sans-serif}
+.btn{background:#2fbf80;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.btn:hover{background:#26a06c}
+.gate{max-width:400px;margin:120px auto;text-align:center}
+.gate input{width:100%;background:#262940;border:1px solid #333650;border-radius:8px;padding:11px 14px;color:#fff;font-size:14px;margin-bottom:12px;font-family:'Inter',sans-serif}
+.section-title{font-size:16px;font-weight:700;margin:32px 0 14px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.stat-box{background:#1e2032;border:1px solid #2a2d42;border-radius:12px;padding:18px}
+.stat-box .lbl{font-size:11px;color:#9a9db8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.stat-box .val{font-size:26px;font-weight:800;color:#2fbf80}
+.money-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.money-box{background:#1e2032;border:1px solid #2a2d42;border-radius:12px;padding:18px;text-align:center}
+.money-box .lbl{font-size:11px;color:#9a9db8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.money-box .val{font-size:22px;font-weight:800}
+.camp-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.camp-box{background:#1e2032;border:1px solid #2a2d42;border-radius:12px;padding:16px;text-align:center}
+.camp-box .lbl{font-size:11px;color:#9a9db8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.camp-box .val{font-size:22px;font-weight:800;color:#2fbf80}
+.chart-card{background:#1e2032;border:1px solid #2a2d42;border-radius:14px;padding:20px;margin-bottom:20px;height:260px}
+.loading{text-align:center;color:#9a9db8;padding:40px}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="logo" style="margin-bottom:24px">Vela — Аналитика</div>
+  <input type="password" id="secret-input" placeholder="Admin secret"/>
+  <button class="btn" style="width:100%" onclick="doLogin()">Войти</button>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+  <div class="top">
+    <div class="logo">Vela — Аналитика</div>
+    <div class="period-box">
+      <span style="color:#9a9db8;font-size:13px">Период (дней):</span>
+      <input type="number" id="days-input" value="30" min="7" max="90"/>
+      <button class="btn" onclick="loadAll()">Обновить</button>
+    </div>
+  </div>
+
+  <div id="content"><div class="loading">Загрузка...</div></div>
+</div>
+
+<script>
+const API = 'https://api.gptcash.ru';
+let SECRET = localStorage.getItem('vela_admin_secret');
+
+if (SECRET) {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadAll();
+}
+
+function doLogin() {
+  const val = document.getElementById('secret-input').value;
+  if (!val) return;
+  localStorage.setItem('vela_admin_secret', val);
+  SECRET = val;
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadAll();
+}
+
+const charts = {};
+
+function fmtMoney(n) {
+  return Math.round(n).toLocaleString('ru') + ' ₽';
+}
+
+function buildChart(canvasId, labels, data, color, label) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  if (charts[canvasId]) charts[canvasId].destroy();
+  charts[canvasId] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: label,
+        data: data,
+        borderColor: color,
+        backgroundColor: color + '22',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#6b6e8a', maxTicksLimit: 8 }, grid: { color: '#2a2d42' } },
+        y: { ticks: { color: '#6b6e8a' }, grid: { color: '#2a2d42' }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+async function loadAll() {
+  const days = parseInt(document.getElementById('days-input').value, 10) || 30;
+  const contentEl = document.getElementById('content');
+
+  try {
+    const res = await fetch(API + '/admin/analytics?days=' + days, {
+      headers: { 'x-admin-secret': SECRET }
+    });
+    if (res.status === 401) {
+      localStorage.removeItem('vela_admin_secret');
+      alert('Неверный admin secret');
+      location.reload();
+      return;
+    }
+    const data = await res.json();
+    render(data);
+  } catch(e) {
+    contentEl.innerHTML = '<div class="loading">Ошибка загрузки: ' + e.message + '</div>';
+  }
+}
+
+function statRowHtml(field, s, isMoney) {
+  const t = isMoney ? fmtMoney(s.today[field]) : s.today[field].toLocaleString('ru');
+  const w = isMoney ? fmtMoney(s.week[field]) : s.week[field].toLocaleString('ru');
+  const mo = isMoney ? fmtMoney(s.month[field]) : s.month[field].toLocaleString('ru');
+  return `<div class="stat-row">    <div class="stat-box"><div class="lbl">Сегодня</div><div class="val">${t}</div></div>    <div class="stat-box"><div class="lbl">За неделю</div><div class="val">${w}</div></div>    <div class="stat-box"><div class="lbl">За месяц</div><div class="val">${mo}</div></div>  </div>`;
+}
+
+function render(data) {
+  const s = data.summary;
+  const m = data.money;
+  const c = data.campaigns;
+  const series = data.series;
+
+  const contentEl = document.getElementById('content');
+  contentEl.innerHTML =
+    '<div class="section-title">Установки расширения</div>' +
+    statRowHtml('installs', s) +
+    '<div class="chart-card"><canvas id="chart-installs"></canvas></div>' +
+
+    '<div class="section-title">Показы рекламы</div>' +
+    statRowHtml('impressions', s) +
+    '<div class="chart-card"><canvas id="chart-impressions"></canvas></div>' +
+
+    '<div class="section-title">Клики по объявлениям</div>' +
+    statRowHtml('clicks', s) +
+    '<div class="chart-card"><canvas id="chart-clicks"></canvas></div>' +
+
+    '<div class="section-title">Активные пользователи</div>' +
+    statRowHtml('activeUsers', s) +
+    '<div class="chart-card"><canvas id="chart-activeUsers"></canvas></div>' +
+
+    '<div class="section-title">Выручка (валовая, от рекламодателей)</div>' +
+    statRowHtml('revenueRub', s, true) +
+    '<div class="money-row">' +
+      '<div class="money-box"><div class="lbl">Начислено юзерам всего</div><div class="val" style="color:#2fbf80">' + fmtMoney(m.accruedRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Доступно к выводу</div><div class="val" style="color:#f5a623">' + fmtMoney(m.availableRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Выплачено</div><div class="val" style="color:#5b9eff">' + fmtMoney(m.paidRub) + '</div></div>' +
+    '</div>' +
+    '<div class="chart-card"><canvas id="chart-revenueRub"></canvas></div>' +
+
+    '<div class="section-title">Рекламные кампании</div>' +
+    '<div class="camp-row">' +
+      '<div class="camp-box"><div class="lbl">Всего</div><div class="val">' + c.total + '</div></div>' +
+      '<div class="camp-box"><div class="lbl">Активные</div><div class="val">' + c.active + '</div></div>' +
+      '<div class="camp-box"><div class="lbl">Неактивные</div><div class="val">' + c.inactive + '</div></div>' +
+      '<div class="camp-box"><div class="lbl">Отклонённые</div><div class="val">' + c.rejected + '</div></div>' +
+    '</div>' +
+    '<div class="stat-row">' +
+      '<div class="stat-box"><div class="lbl">Запущено сегодня</div><div class="val">' + c.today + '</div></div>' +
+      '<div class="stat-box"><div class="lbl">За неделю</div><div class="val">' + c.week + '</div></div>' +
+      '<div class="stat-box"><div class="lbl">За месяц</div><div class="val">' + c.month + '</div></div>' +
+    '</div>' +
+    '<div class="chart-card"><canvas id="chart-campaignsLaunched"></canvas></div>';
+
+  const labels = series.map(d => d.date.slice(5));
+  buildChart('chart-installs', labels, series.map(d => d.installs), '#2fbf80', 'Установки');
+  buildChart('chart-impressions', labels, series.map(d => d.impressions), '#5b9eff', 'Показы');
+  buildChart('chart-clicks', labels, series.map(d => d.clicks), '#f5a623', 'Клики');
+  buildChart('chart-activeUsers', labels, series.map(d => d.activeUsers), '#a685e2', 'Активные юзеры');
+  buildChart('chart-revenueRub', labels, series.map(d => d.revenueRub), '#2fbf80', 'Выручка, ₽');
+  buildChart('chart-campaignsLaunched', labels, series.map(d => d.campaignsLaunched), '#e55', 'Кампании');
+}
+</script>
+</body>
+</html>
