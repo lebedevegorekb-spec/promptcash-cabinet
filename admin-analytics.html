@@ -12,8 +12,11 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 .wrap{max-width:1200px;margin:0 auto}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px}
 .logo{font-weight:300;letter-spacing:0.18em;text-transform:uppercase;font-size:18px}
-.period-box{display:flex;gap:8px;align-items:center}
-.period-box input{background:#262940;border:1px solid #333650;border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;width:80px;font-family:'Inter',sans-serif}
+.period-box{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.period-box input[type=date]{background:#262940;border:1px solid #333650;border-radius:8px;padding:8px 10px;color:#fff;font-size:13px;font-family:'Inter',sans-serif}
+.preset-btn{background:#262940;border:1px solid #333650;border-radius:8px;padding:8px 12px;color:#9a9db8;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
+.preset-btn:hover{border-color:#2fbf80;color:#fff}
+.preset-btn.active{background:#2fbf80;border-color:#2fbf80;color:#fff;font-weight:600}
 .btn{background:#2fbf80;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
 .btn:hover{background:#26a06c}
 .gate{max-width:400px;margin:120px auto;text-align:center}
@@ -47,9 +50,17 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
   <div class="top">
     <div class="logo">Vela — Аналитика</div>
     <div class="period-box">
-      <span style="color:#9a9db8;font-size:13px">Период (дней):</span>
-      <input type="number" id="days-input" value="30" min="7" max="90"/>
-      <button class="btn" onclick="loadAll()">Обновить</button>
+      <button class="preset-btn active" data-preset="week" onclick="applyPreset(this,'week')">Неделя</button>
+      <button class="preset-btn" data-preset="today" onclick="applyPreset(this,'today')">Сегодня</button>
+      <button class="preset-btn" data-preset="yesterday" onclick="applyPreset(this,'yesterday')">Вчера</button>
+      <button class="preset-btn" data-preset="month" onclick="applyPreset(this,'month')">Месяц</button>
+      <button class="preset-btn" data-preset="lastmonth" onclick="applyPreset(this,'lastmonth')">Прошлый месяц</button>
+      <button class="preset-btn" data-preset="3months" onclick="applyPreset(this,'3months')">3 месяца</button>
+      <button class="preset-btn" data-preset="year" onclick="applyPreset(this,'year')">Год</button>
+      <input type="date" id="date-from"/>
+      <span style="color:#6b6e8a">—</span>
+      <input type="date" id="date-to"/>
+      <button class="btn" onclick="loadAll()">Применить</button>
     </div>
   </div>
 
@@ -63,9 +74,8 @@ let SECRET = localStorage.getItem('vela_admin_secret');
 if (SECRET) {
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  loadAll();
+  applyPreset(document.querySelector('[data-preset="week"]'), 'week');
 }
-
 function doLogin() {
   const val = document.getElementById('secret-input').value;
   if (!val) return;
@@ -73,9 +83,8 @@ function doLogin() {
   SECRET = val;
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  loadAll();
+  applyPreset(document.querySelector('[data-preset="week"]'), 'week');
 }
-
 const charts = {};
 
 function fmtMoney(n) {
@@ -125,12 +134,46 @@ function buildChart(canvasId, labels, data, color, label) {
   });
 }
 
+function fmtDate(d) { return d.toISOString().slice(0, 10); }
+
+function computePresetDates(preset) {
+  const today = new Date();
+  let from = new Date(today), to = new Date(today);
+  if (preset === 'yesterday') { from.setDate(from.getDate() - 1); to.setDate(to.getDate() - 1); }
+  else if (preset === 'week') { from.setDate(from.getDate() - 6); }
+  else if (preset === 'month') { from.setDate(from.getDate() - 29); }
+  else if (preset === 'lastmonth') {
+    to = new Date(today.getFullYear(), today.getMonth(), 0);
+    from = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  }
+  else if (preset === '3months') { from.setDate(from.getDate() - 89); }
+  else if (preset === 'year') { from.setDate(from.getDate() - 364); }
+  return { from: fmtDate(from), to: fmtDate(to) };
+}
+
+function applyPreset(btn, preset) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const d = computePresetDates(preset);
+  document.getElementById('date-from').value = d.from;
+  document.getElementById('date-to').value = d.to;
+  loadAll();
+}
+
 async function loadAll() {
-  const days = parseInt(document.getElementById('days-input').value, 10) || 30;
+  const fromVal = document.getElementById('date-from').value;
+  const toVal = document.getElementById('date-to').value;
   const contentEl = document.getElementById('content');
 
+  let url = API + '/admin/analytics?';
+  if (fromVal && toVal) {
+    url += 'from=' + fromVal + '&to=' + toVal;
+  } else {
+    url += 'days=30';
+  }
+
   try {
-    const res = await fetch(API + '/admin/analytics?days=' + days, {
+    const res = await fetch(url, {
       headers: { 'x-admin-secret': SECRET }
     });
     if (res.status === 401) {
@@ -211,4 +254,5 @@ function render(data) {
 </script>
 </body>
 </html>
+
 
