@@ -103,7 +103,20 @@ function buildChart(canvasId, labels, data, color, label) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e2032',
+          borderColor: '#2a2d42',
+          borderWidth: 1,
+          titleColor: '#fff',
+          bodyColor: '#2fbf80',
+          padding: 10,
+          displayColors: false,
+          callbacks: { label: (ctx) => label + ': ' + ctx.parsed.y.toLocaleString('ru') }
+        }
+      },
       scales: {
         x: { ticks: { color: '#6b6e8a', maxTicksLimit: 8 }, grid: { color: '#2a2d42' } },
         y: { ticks: { color: '#6b6e8a' }, grid: { color: '#2a2d42' }, beginAtZero: true }
@@ -198,3 +211,4 @@ function render(data) {
 </script>
 </body>
 </html>
+
