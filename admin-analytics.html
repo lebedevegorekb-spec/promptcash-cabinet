@@ -75,10 +75,10 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 
 <script>
 const API = 'https://romptcash-backend.onrender.com';
-let SECRET = localStorage.getItem('pc_admin_secret');
+const HARDCODED_SECRET = 'promptcash_admin_2024'; let SECRET = localStorage.getItem('pc_admin_secret') || HARDCODED_SECRET;
 
 if (SECRET) {
-  document.getElementById('gate').style.display = 'none';
+  document.getElementById('gate').style.display = 'none'; SECRET = HARDCODED_SECRET;
   document.getElementById('app').style.display = 'block';
   applyPreset(document.querySelector('[data-preset="week"]'), 'week');
 }
@@ -87,7 +87,7 @@ function doLogin() {
   if (!val) return;
   localStorage.setItem('pc_admin_secret', val);
   SECRET = val;
-  document.getElementById('gate').style.display = 'none';
+  document.getElementById('gate').style.display = 'none'; SECRET = HARDCODED_SECRET;
   document.getElementById('app').style.display = 'block';
   applyPreset(document.querySelector('[data-preset="week"]'), 'week');
 }
@@ -296,6 +296,7 @@ function renderFinance(data) {
 </script>
 </body>
 </html>
+
 
 
 
