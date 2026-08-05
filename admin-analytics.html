@@ -75,7 +75,7 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 
 <script>
 const API = 'https://romptcash-backend.onrender.com';
-let SECRET = localStorage.getItem('pc_admin_secret');
+let SECRET = sessionStorage.getItem('pc_admin_secret');
 
 if (SECRET) {
   document.getElementById('gate').style.display = 'none';
@@ -85,7 +85,7 @@ if (SECRET) {
 function doLogin() {
   const val = document.getElementById('secret-input').value;
   if (!val) return;
-  localStorage.setItem('pc_admin_secret', val);
+  sessionStorage.setItem('pc_admin_secret', val);
   SECRET = val;
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
@@ -192,7 +192,7 @@ async function loadAll() {
       headers: { 'x-admin-secret': SECRET }
     });
     if (res.status === 401) {
-      localStorage.removeItem('pc_admin_secret');
+      sessionStorage.removeItem('pc_admin_secret');
       alert('Неверный admin secret');
       location.reload();
       return;
@@ -296,6 +296,7 @@ function renderFinance(data) {
 </script>
 </body>
 </html>
+
 
 
 
