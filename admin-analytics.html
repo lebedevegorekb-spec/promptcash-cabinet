@@ -75,17 +75,17 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 
 <script>
 const API = 'https://romptcash-backend.onrender.com';
-const HARDCODED_SECRET = 'promptcash_admin_2024'; let SECRET = HARDCODED_SECRET;
-if (SECRET) {
+const HARDCODED_SECRET = 'promptcash_admin_2024';
+let SECRET = HARDCODED_SECRET;
+document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-}
-
-if (SECRET) {
-  document.getElementById('gate').style.display = 'none'; SECRET = HARDCODED_SECRET;
-  document.getElementById('app').style.display = 'block';
   applyPreset(document.querySelector('[data-preset="week"]'), 'week');
-}
+});
+
+
+
+
 function doLogin() {
   const val = document.getElementById('secret-input').value;
   if (!val) return;
