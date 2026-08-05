@@ -36,6 +36,7 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 .camp-box .val{font-size:22px;font-weight:800;color:#2fbf80}
 .chart-card{background:#1e2032;border:1px solid #2a2d42;border-radius:14px;padding:20px;margin-bottom:20px;height:260px}
 .loading{text-align:center;color:#9a9db8;padding:40px}
+.tabs{display:flex;gap:4px;margin-bottom:24px;background:#1e2032;border-radius:10px;padding:4px;width:fit-content}.tab-btn{padding:8px 20px;border-radius:7px;border:none;background:none;color:#9a9db8;font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s}.tab-btn.active{background:#2fbf80;color:#fff}
 </style>
 </head>
 <body>
@@ -57,6 +58,7 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
       <button class="preset-btn" data-preset="lastmonth" onclick="applyPreset(this,'lastmonth')">Прошлый месяц</button>
       <button class="preset-btn" data-preset="3months" onclick="applyPreset(this,'3months')">3 месяца</button>
       <button class="preset-btn" data-preset="year" onclick="applyPreset(this,'year')">Год</button>
+      <button class="preset-btn" data-preset="all" onclick="applyPreset(this,'all')">За всё время</button>
       <input type="date" id="date-from"/>
       <span style="color:#6b6e8a">—</span>
       <input type="date" id="date-to"/>
@@ -64,6 +66,10 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
     </div>
   </div>
 
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('product',this)">Продукт</button>
+    <button class="tab-btn" onclick="switchTab('finance',this)">Финансы</button>
+  </div>
   <div id="content"><div class="loading">Загрузка...</div></div>
 </div>
 
@@ -86,6 +92,14 @@ function doLogin() {
   applyPreset(document.querySelector('[data-preset="week"]'), 'week');
 }
 const charts = {};
+let currentTab = 'product';
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderContent();
+}
+let lastData = null;
 
 function fmtMoney(n) {
   return Math.round(n).toLocaleString('ru') + ' ₽';
@@ -148,6 +162,7 @@ function computePresetDates(preset) {
   }
   else if (preset === '3months') { from.setDate(from.getDate() - 89); }
   else if (preset === 'year') { from.setDate(from.getDate() - 364); }
+  else if (preset === 'all') { from = new Date('2025-01-01'); }
   return { from: fmtDate(from), to: fmtDate(to) };
 }
 
@@ -196,7 +211,34 @@ function statRowHtml(field, s, isMoney) {
   return `<div class="stat-row">    <div class="stat-box"><div class="lbl">Сегодня</div><div class="val">${t}</div></div>    <div class="stat-box"><div class="lbl">За неделю</div><div class="val">${w}</div></div>    <div class="stat-box"><div class="lbl">За месяц</div><div class="val">${mo}</div></div>  </div>`;
 }
 
-function render(data) {
+function renderContent() {
+  if (!lastData) return;
+  if (currentTab === 'product') renderProduct(lastData);
+  else renderFinance(lastData);
+}
+function renderFinance(data) {
+  const m = data.money;
+  const s = data.summary;
+  const contentEl = document.getElementById('content');
+  contentEl.innerHTML =
+    '<div class="section-title">Выручка (расходы рекламодателей на показы)</div>' +
+    '<div class="money-row">' +
+      '<div class="money-box"><div class="lbl">Сегодня</div><div class="val" style="color:#2fbf80">' + Math.round(s.today.revenueRub).toLocaleString('ru') + ' ₽</div></div>' +
+      '<div class="money-box"><div class="lbl">За неделю</div><div class="val" style="color:#2fbf80">' + Math.round(s.week.revenueRub).toLocaleString('ru') + ' ₽</div></div>' +
+      '<div class="money-box"><div class="lbl">За месяц</div><div class="val" style="color:#2fbf80">' + Math.round(s.month.revenueRub).toLocaleString('ru') + ' ₽</div></div>' +
+    '</div>' +
+    '<div class="section-title">Выплаты пользователям</div>' +
+    '<div class="money-row">' +
+      '<div class="money-box"><div class="lbl">Начислено всего юзерам</div><div class="val" style="color:#a685e2">' + Math.round(m.accruedRub).toLocaleString('ru') + ' ₽</div></div>' +
+      '<div class="money-box"><div class="lbl">Доступно к выводу</div><div class="val" style="color:#f5a623">' + Math.round(m.availableRub).toLocaleString('ru') + ' ₽</div></div>' +
+      '<div class="money-box"><div class="lbl">Выплачено</div><div class="val" style="color:#5b9eff">' + Math.round(m.paidRub).toLocaleString('ru') + ' ₽</div></div>' +
+    '</div>' +
+    '<div class="money-row">' +
+      '<div class="money-box"><div class="lbl">Из кошельков (без бонусов)</div><div class="val">' + Math.round(m.walletOnlyRub).toLocaleString('ru') + ' ₽</div></div>' +
+      '<div class="money-box"><div class="lbl">Бонусы за онбординг</div><div class="val">' + Math.round(m.bonusesOnlyRub).toLocaleString('ru') + ' ₽</div></div>' +
+      '<div class="money-box"><div class="lbl">Реферальные</div><div class="val">' + Math.round(m.referralOnlyRub).toLocaleString('ru') + ' ₽</div></div>' +
+    '</div>';
+}
   const s = data.summary;
   const m = data.money;
   const c = data.campaigns;
@@ -254,6 +296,11 @@ function render(data) {
 </script>
 </body>
 </html>
+
+
+
+
+
 
 
 
