@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Vela â€” ÐÐ½Ð°Ð»Ð¸Ñ‚Ð¸ÐºÐ°</title>
+<title>Vela — Аналитика</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -41,27 +41,27 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 <body>
 <div class="wrap">
   <div class="top">
-    <div class="logo">Vela â€” ÐÐ½Ð°Ð»Ð¸Ñ‚Ð¸ÐºÐ°</div>
+    <div class="logo">Vela — Аналитика</div>
     <div class="period-box">
-      <button class="preset-btn" onclick="applyPreset(this,'today')">Ð¡ÐµÐ³Ð¾Ð´Ð½Ñ</button>
-      <button class="preset-btn" onclick="applyPreset(this,'yesterday')">Ð’Ñ‡ÐµÑ€Ð°</button>
-      <button class="preset-btn active" onclick="applyPreset(this,'week')">ÐÐµÐ´ÐµÐ»Ñ</button>
-      <button class="preset-btn" onclick="applyPreset(this,'month')">ÐœÐµÑÑÑ†</button>
-      <button class="preset-btn" onclick="applyPreset(this,'lastmonth')">ÐŸÑ€Ð¾ÑˆÐ»Ñ‹Ð¹ Ð¼ÐµÑÑÑ†</button>
-      <button class="preset-btn" onclick="applyPreset(this,'3months')">3 Ð¼ÐµÑÑÑ†Ð°</button>
-      <button class="preset-btn" onclick="applyPreset(this,'year')">Ð“Ð¾Ð´</button>
-      <button class="preset-btn" onclick="applyPreset(this,'all')">Ð—Ð° Ð²ÑÑ‘ Ð²Ñ€ÐµÐ¼Ñ</button>
+      <button class="preset-btn" onclick="applyPreset(this,'today')">Сегодня</button>
+      <button class="preset-btn" onclick="applyPreset(this,'yesterday')">Вчера</button>
+      <button class="preset-btn active" onclick="applyPreset(this,'week')">Неделя</button>
+      <button class="preset-btn" onclick="applyPreset(this,'month')">Месяц</button>
+      <button class="preset-btn" onclick="applyPreset(this,'lastmonth')">Прошлый месяц</button>
+      <button class="preset-btn" onclick="applyPreset(this,'3months')">3 месяца</button>
+      <button class="preset-btn" onclick="applyPreset(this,'year')">Год</button>
+      <button class="preset-btn" onclick="applyPreset(this,'all')">За всё время</button>
       <input type="date" id="date-from"/>
-      <span style="color:#6b6e8a">â€”</span>
+      <span style="color:#6b6e8a">—</span>
       <input type="date" id="date-to"/>
-      <button class="btn" onclick="loadAll()">ÐŸÑ€Ð¸Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ</button>
+      <button class="btn" onclick="loadAll()">Применить</button>
     </div>
   </div>
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('product',this)">ÐŸÑ€Ð¾Ð´ÑƒÐºÑ‚</button>
-    <button class="tab-btn" onclick="switchTab('finance',this)">Ð¤Ð¸Ð½Ð°Ð½ÑÑ‹</button>
+    <button class="tab-btn active" onclick="switchTab('product',this)">Продукт</button>
+    <button class="tab-btn" onclick="switchTab('finance',this)">Финансы</button>
   </div>
-  <div id="content"><div class="loading">Ð—Ð°Ð³Ñ€ÑƒÐ·ÐºÐ°...</div></div>
+  <div id="content"><div class="loading">Загрузка...</div></div>
 </div>
 
 <script>
@@ -72,7 +72,7 @@ let currentTab = 'product';
 let lastData = null;
 
 function fmtMoney(n) {
-  return Math.round(n).toLocaleString('ru') + ' â‚½';
+  return Math.round(n).toLocaleString('ru') + ' ₽';
 }
 
 function fmtDate(d) {
@@ -133,7 +133,7 @@ function buildChart(canvasId, labels, data, color, label) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: true, mode: 'index', intersect: false } },
+      plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { color: '#6b6e8a', maxTicksLimit: 10 }, grid: { color: '#1e2032' } },
         y: { ticks: { color: '#6b6e8a' }, grid: { color: '#2a2d42' }, beginAtZero: true }
@@ -145,9 +145,9 @@ function buildChart(canvasId, labels, data, color, label) {
 function statRowHtml(field, s, isMoney) {
   const fmt = v => isMoney ? fmtMoney(v) : (v||0).toLocaleString('ru');
   return `<div class="stat-row">
-    <div class="stat-box"><div class="lbl">Ð¡ÐµÐ³Ð¾Ð´Ð½Ñ</div><div class="val">${fmt(s.today[field])}</div></div>
-    <div class="stat-box"><div class="lbl">Ð—Ð° Ð½ÐµÐ´ÐµÐ»ÑŽ</div><div class="val">${fmt(s.week[field])}</div></div>
-    <div class="stat-box"><div class="lbl">Ð—Ð° Ð¼ÐµÑÑÑ†</div><div class="val">${fmt(s.month[field])}</div></div>
+    <div class="stat-box"><div class="lbl">Сегодня</div><div class="val">${fmt(s.today[field])}</div></div>
+    <div class="stat-box"><div class="lbl">За неделю</div><div class="val">${fmt(s.week[field])}</div></div>
+    <div class="stat-box"><div class="lbl">За месяц</div><div class="val">${fmt(s.month[field])}</div></div>
   </div>`;
 }
 
@@ -165,42 +165,42 @@ function renderProduct(data) {
   const contentEl = document.getElementById('content');
 
   contentEl.innerHTML =
-    '<div class="section-title">Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ¸ Ñ€Ð°ÑÑˆÐ¸Ñ€ÐµÐ½Ð¸Ñ</div>' +
+    '<div class="section-title">Установки расширения</div>' +
     statRowHtml('installs', s) +
     '<div class="chart-card"><canvas id="chart-installs"></canvas></div>' +
 
-    '<div class="section-title">ÐŸÐ¾ÐºÐ°Ð·Ñ‹ Ñ€ÐµÐºÐ»Ð°Ð¼Ñ‹</div>' +
+    '<div class="section-title">Показы рекламы</div>' +
     statRowHtml('impressions', s) +
     '<div class="chart-card"><canvas id="chart-impressions"></canvas></div>' +
 
-    '<div class="section-title">ÐšÐ»Ð¸ÐºÐ¸ Ð¿Ð¾ Ð¾Ð±ÑŠÑÐ²Ð»ÐµÐ½Ð¸ÑÐ¼</div>' +
+    '<div class="section-title">Клики по объявлениям</div>' +
     statRowHtml('clicks', s) +
     '<div class="chart-card"><canvas id="chart-clicks"></canvas></div>' +
 
-    '<div class="section-title">ÐÐºÑ‚Ð¸Ð²Ð½Ñ‹Ðµ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ð¸</div>' +
+    '<div class="section-title">Активные пользователи</div>' +
     statRowHtml('activeUsers', s) +
     '<div class="chart-card"><canvas id="chart-activeUsers"></canvas></div>' +
 
-    '<div class="section-title">Ð ÐµÐºÐ»Ð°Ð¼Ð½Ñ‹Ðµ ÐºÐ°Ð¼Ð¿Ð°Ð½Ð¸Ð¸</div>' +
+    '<div class="section-title">Рекламные кампании</div>' +
     '<div class="camp-row">' +
-      '<div class="camp-box"><div class="lbl">Ð’ÑÐµÐ³Ð¾</div><div class="val">' + c.total + '</div></div>' +
-      '<div class="camp-box"><div class="lbl">ÐÐºÑ‚Ð¸Ð²Ð½Ñ‹Ðµ</div><div class="val">' + c.active + '</div></div>' +
-      '<div class="camp-box"><div class="lbl">ÐÐµÐ°ÐºÑ‚Ð¸Ð²Ð½Ñ‹Ðµ</div><div class="val">' + c.inactive + '</div></div>' +
-      '<div class="camp-box"><div class="lbl">ÐžÑ‚ÐºÐ»Ð¾Ð½Ñ‘Ð½Ð½Ñ‹Ðµ</div><div class="val">' + c.rejected + '</div></div>' +
+      '<div class="camp-box"><div class="lbl">Всего</div><div class="val">' + c.total + '</div></div>' +
+      '<div class="camp-box"><div class="lbl">Активные</div><div class="val">' + c.active + '</div></div>' +
+      '<div class="camp-box"><div class="lbl">Неактивные</div><div class="val">' + c.inactive + '</div></div>' +
+      '<div class="camp-box"><div class="lbl">Отклонённые</div><div class="val">' + c.rejected + '</div></div>' +
     '</div>' +
     '<div class="stat-row">' +
-      '<div class="stat-box"><div class="lbl">Ð—Ð°Ð¿ÑƒÑ‰ÐµÐ½Ð¾ ÑÐµÐ³Ð¾Ð´Ð½Ñ</div><div class="val">' + c.today + '</div></div>' +
-      '<div class="stat-box"><div class="lbl">Ð—Ð° Ð½ÐµÐ´ÐµÐ»ÑŽ</div><div class="val">' + c.week + '</div></div>' +
-      '<div class="stat-box"><div class="lbl">Ð—Ð° Ð¼ÐµÑÑÑ†</div><div class="val">' + c.month + '</div></div>' +
+      '<div class="stat-box"><div class="lbl">Запущено сегодня</div><div class="val">' + c.today + '</div></div>' +
+      '<div class="stat-box"><div class="lbl">За неделю</div><div class="val">' + c.week + '</div></div>' +
+      '<div class="stat-box"><div class="lbl">За месяц</div><div class="val">' + c.month + '</div></div>' +
     '</div>' +
     '<div class="chart-card"><canvas id="chart-campaignsLaunched"></canvas></div>';
 
   const labels = series.map(d => d.date.slice(5));
-  buildChart('chart-installs', labels, series.map(d => d.installs), '#2fbf80', 'Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ¸');
-  buildChart('chart-impressions', labels, series.map(d => d.impressions), '#5b9eff', 'ÐŸÐ¾ÐºÐ°Ð·Ñ‹');
-  buildChart('chart-clicks', labels, series.map(d => d.clicks), '#f5a623', 'ÐšÐ»Ð¸ÐºÐ¸');
-  buildChart('chart-activeUsers', labels, series.map(d => d.activeUsers), '#a685e2', 'ÐÐºÑ‚Ð¸Ð²Ð½Ñ‹Ðµ ÑŽÐ·ÐµÑ€Ñ‹');
-  buildChart('chart-campaignsLaunched', labels, series.map(d => d.campaignsLaunched), '#e55', 'ÐšÐ°Ð¼Ð¿Ð°Ð½Ð¸Ð¸');
+  buildChart('chart-installs', labels, series.map(d => d.installs), '#2fbf80', 'Установки');
+  buildChart('chart-impressions', labels, series.map(d => d.impressions), '#5b9eff', 'Показы');
+  buildChart('chart-clicks', labels, series.map(d => d.clicks), '#f5a623', 'Клики');
+  buildChart('chart-activeUsers', labels, series.map(d => d.activeUsers), '#a685e2', 'Активные юзеры');
+  buildChart('chart-campaignsLaunched', labels, series.map(d => d.campaignsLaunched), '#e55', 'Кампании');
 }
 
 function renderFinance(data) {
@@ -210,35 +210,35 @@ function renderFinance(data) {
   const contentEl = document.getElementById('content');
 
   contentEl.innerHTML =
-    '<div class="section-title">Ð’Ñ‹Ñ€ÑƒÑ‡ÐºÐ° (Ñ€Ð°ÑÑ…Ð¾Ð´Ñ‹ Ñ€ÐµÐºÐ»Ð°Ð¼Ð¾Ð´Ð°Ñ‚ÐµÐ»ÐµÐ¹ Ð½Ð° Ð¿Ð¾ÐºÐ°Ð·Ñ‹)</div>' +
+    '<div class="section-title">Выручка (расходы рекламодателей на показы)</div>' +
     '<div class="money-row">' +
-      '<div class="money-box"><div class="lbl">Ð¡ÐµÐ³Ð¾Ð´Ð½Ñ</div><div class="val" style="color:#2fbf80">' + fmtMoney(s.today.revenueRub) + '</div></div>' +
-      '<div class="money-box"><div class="lbl">Ð—Ð° Ð½ÐµÐ´ÐµÐ»ÑŽ</div><div class="val" style="color:#2fbf80">' + fmtMoney(s.week.revenueRub) + '</div></div>' +
-      '<div class="money-box"><div class="lbl">Ð—Ð° Ð¼ÐµÑÑÑ†</div><div class="val" style="color:#2fbf80">' + fmtMoney(s.month.revenueRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Сегодня</div><div class="val" style="color:#2fbf80">' + fmtMoney(s.today.revenueRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">За неделю</div><div class="val" style="color:#2fbf80">' + fmtMoney(s.week.revenueRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">За месяц</div><div class="val" style="color:#2fbf80">' + fmtMoney(s.month.revenueRub) + '</div></div>' +
     '</div>' +
     '<div class="chart-card"><canvas id="chart-revenueRub"></canvas></div>' +
 
-    '<div class="section-title">Ð’Ñ‹Ð¿Ð»Ð°Ñ‚Ñ‹ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑÐ¼ (Ð²ÑÐµÐ³Ð¾ Ð·Ð° Ð²ÑÑ‘ Ð²Ñ€ÐµÐ¼Ñ)</div>' +
+    '<div class="section-title">Выплаты пользователям (всего за всё время)</div>' +
     '<div class="money-row">' +
-      '<div class="money-box"><div class="lbl">ÐÐ°Ñ‡Ð¸ÑÐ»ÐµÐ½Ð¾ Ð²ÑÐµÐ³Ð¾</div><div class="val" style="color:#a685e2">' + fmtMoney(m.accruedRub) + '</div></div>' +
-      '<div class="money-box"><div class="lbl">Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾ Ðº Ð²Ñ‹Ð²Ð¾Ð´Ñƒ</div><div class="val" style="color:#f5a623">' + fmtMoney(m.availableRub) + '</div></div>' +
-      '<div class="money-box"><div class="lbl">Ð’Ñ‹Ð¿Ð»Ð°Ñ‡ÐµÐ½Ð¾</div><div class="val" style="color:#5b9eff">' + fmtMoney(m.paidRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Начислено всего</div><div class="val" style="color:#a685e2">' + fmtMoney(m.accruedRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Доступно к выводу</div><div class="val" style="color:#f5a623">' + fmtMoney(m.availableRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Выплачено</div><div class="val" style="color:#5b9eff">' + fmtMoney(m.paidRub) + '</div></div>' +
     '</div>' +
     '<div class="money-row">' +
-      '<div class="money-box"><div class="lbl">Ð˜Ð· Ð¿Ð¾ÐºÐ°Ð·Ð¾Ð²</div><div class="val">' + fmtMoney(m.walletOnlyRub) + '</div></div>' +
-      '<div class="money-box"><div class="lbl">Ð‘Ð¾Ð½ÑƒÑÑ‹ Ð·Ð° Ð¾Ð½Ð±Ð¾Ñ€Ð´Ð¸Ð½Ð³</div><div class="val">' + fmtMoney(m.bonusesOnlyRub) + '</div></div>' +
-      '<div class="money-box"><div class="lbl">Ð ÐµÑ„ÐµÑ€Ð°Ð»ÑŒÐ½Ñ‹Ðµ</div><div class="val">' + fmtMoney(m.referralOnlyRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Из показов</div><div class="val">' + fmtMoney(m.walletOnlyRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Бонусы за онбординг</div><div class="val">' + fmtMoney(m.bonusesOnlyRub) + '</div></div>' +
+      '<div class="money-box"><div class="lbl">Реферальные</div><div class="val">' + fmtMoney(m.referralOnlyRub) + '</div></div>' +
     '</div>';
 
   const labels = series.map(d => d.date.slice(5));
-  buildChart('chart-revenueRub', labels, series.map(d => d.revenueRub), '#2fbf80', 'Ð’Ñ‹Ñ€ÑƒÑ‡ÐºÐ°, â‚½');
+  buildChart('chart-revenueRub', labels, series.map(d => d.revenueRub), '#2fbf80', 'Выручка, ₽');
 }
 
 async function loadAll() {
   const fromVal = document.getElementById('date-from').value;
   const toVal = document.getElementById('date-to').value;
   const contentEl = document.getElementById('content');
-  contentEl.innerHTML = '<div class="loading">Ð—Ð°Ð³Ñ€ÑƒÐ·ÐºÐ°...</div>';
+  contentEl.innerHTML = '<div class="loading">Загрузка...</div>';
 
   let url = API + '/admin/analytics?';
   if (fromVal && toVal) {
@@ -253,14 +253,12 @@ async function loadAll() {
     lastData = data;
     renderContent();
   } catch(e) {
-    contentEl.innerHTML = '<div class="loading">ÐžÑˆÐ¸Ð±ÐºÐ° Ð·Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸: ' + e.message + '</div>';
+    contentEl.innerHTML = '<div class="loading">Ошибка загрузки: ' + e.message + '</div>';
   }
 }
 
-// ÐÐ²Ñ‚Ð¾Ð·Ð°Ð¿ÑƒÑÐº
+// Автозапуск
 applyPreset(document.querySelector('.preset-btn.active'), 'week');
 </script>
 </body>
 </html>
-
-
