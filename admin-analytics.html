@@ -41,13 +41,13 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 </head>
 <body>
 
-<div class="gate" id="gate">
+<div class="gate" id="gate" style="display:none">
   <div class="logo" style="margin-bottom:24px">Vela — Аналитика</div>
   <input type="password" id="secret-input" placeholder="Admin secret"/>
   <button class="btn" style="width:100%" onclick="doLogin()">Войти</button>
 </div>
 
-<div class="wrap" id="app" style="display:none">
+<div class="wrap" id="app">
   <div class="top">
     <div class="logo">Vela — Аналитика</div>
     <div class="period-box">
@@ -299,6 +299,7 @@ applyPreset(document.querySelector('[data-preset="week"]'), 'week');
 </script>
 </body>
 </html>
+
 
 
 
