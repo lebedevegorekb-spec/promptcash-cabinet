@@ -77,11 +77,8 @@ body{font-family:'Inter',sans-serif;background:#161826;color:#f0f0f0;font-size:1
 const API = 'https://romptcash-backend.onrender.com';
 const HARDCODED_SECRET = 'promptcash_admin_2024';
 let SECRET = HARDCODED_SECRET;
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('gate').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  applyPreset(document.querySelector('[data-preset="week"]'), 'week');
-});
+document.getElementById('gate').style.display = 'none';
+document.getElementById('app').style.display = 'block';
 
 
 
@@ -297,9 +294,13 @@ function renderFinance(data) {
   buildChart('chart-revenueRub', labels, series.map(d => d.revenueRub), '#2fbf80', 'Выручка, ₽');
   buildChart('chart-campaignsLaunched', labels, series.map(d => d.campaignsLaunched), '#e55', 'Кампании');
 }
+// Auto-init
+applyPreset(document.querySelector('[data-preset="week"]'), 'week');
 </script>
 </body>
 </html>
+
+
 
 
 
